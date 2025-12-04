@@ -48,15 +48,3 @@ dependencies {
 files {
     'locales/*.json'
 }
-
--- Escrow: Encrypt client and server files, keep shared files open
-escrow_ignore {
-    'shared/sh_config.lua',
-    'shared/sh_weed.lua',
-    'shared/sh_strains.lua',
-    'shared/sh_plants.lua',
-    'shared/sh_items.lua',
-    'shared/sh_cornering.lua',
-    'locales/*.json'
-}
-dependency '/assetpacks'

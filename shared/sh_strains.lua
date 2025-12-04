@@ -5,7 +5,7 @@ Weed.Strains.Config = {
     UpdateTimer = 10 * 60 * 1000, -- 10 minutes
     MaxStrainsPerPlayer = 5,
     
-    -- 6 Default Strains
+    -- 6 Default Strains (randomly assigned to seeds without a custom strain)
     DefaultStrains = {
         { name = "OG Kush", n = 0.60, p = 0.50, k = 0.40 },
         { name = "White Widow", n = 0.45, p = 0.70, k = 0.55 },

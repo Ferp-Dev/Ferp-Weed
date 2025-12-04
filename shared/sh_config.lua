@@ -9,11 +9,11 @@ Config.ProgressPosition = 'bottom' -- 'bottom', 'middle', 'top'
 
 -- Performance Settings
 Config.Performance = {
-    SpawnDistance = 50.0,      -- Distance to spawn plant objects
-    DespawnDistance = 75.0,    -- Distance to despawn plant objects
-    UpdateInterval = 2000,     -- Client-side spawn/despawn check interval
-    BatchSize = 15,            -- Max plants to spawn per tick
-    ServerUpdateInterval = 300, -- Server growth update interval
+    SpawnDistance = 50.0,      -- Distance to spawn plant objects (meters)
+    DespawnDistance = 75.0,    -- Distance to despawn plant objects (meters)
+    UpdateInterval = 2000,     -- Client-side spawn/despawn check interval (ms)
+    BatchSize = 15,            -- Max plants to spawn per tick (prevents freezing)
+    ServerUpdateInterval = 300, -- Server growth update interval (seconds) - 5 minutes
     ChunkSize = 100.0,         -- Size of chunks for spatial partitioning
     MaxVisiblePlants = 200,    -- Max plants visible at once per player
 }
@@ -47,17 +47,17 @@ Config.ObjectNetworked = true
 
 -- Hand Prop System
 Config.HandProps = {
-    Enabled = true, 
+    Enabled = true, -- Habilita/desabilita
     Items = {
         ['weed_brick'] = {
-            model = 'prop_weed_block_01',
+            model = 'prop_weed_block_01', -- Modelo do prop
             bone = 60309,
-            pos = vec3(0.1, 0.1, 0.05),
-            rot = vec3(0.0, -90.0, 90.0),
+            pos = vec3(0.1, 0.1, 0.05), -- Posição
+            rot = vec3(0.0, -90.0, 90.0), -- Rotação
             anim = {
                 dict = 'impexp_int-0',
                 clip = 'mp_m_waremech_01_dual-0',
-                flag = 49 
+                flag = 49 -- Loop + Move
             }
         },
         -- Adicione mais itens aqui se quiser

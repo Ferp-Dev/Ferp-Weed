@@ -122,7 +122,7 @@ function Weed.Cornering.CalculatePrice(quality, strainReputation)
     return math.floor(basePrice)
 end
 
--- Payout configuration 
+-- Payout configuration (simple: 'dirty' or 'clean')
 Weed.Cornering.Config.Payout = {
     Type = 'clean', -- 'dirty' or 'clean'
     Items = {
