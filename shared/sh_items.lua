@@ -4,7 +4,7 @@ Weed.Items.Config = {
     -- Processing
     BudsPerBrick = 5, -- Buds needed to make 1 brick
     BaggiesPerBrick = 10, -- Baggies from 1 brick
-    JointsPerBaggie = 3, -- Joints from 1 baggie (needs same amount of rolling paper)
+    JointsPerBaggie = 3, -- Joints from 1 baggie
     JointLossRate = 1.0, -- Quality loss rate
     
     -- Joint Effects
@@ -51,7 +51,7 @@ Weed.Items.Config = {
     },
     
     -- Scale durability
-    ScaleDurabilityLoss = 10, -- % de durabilidade perdida por uso (10 usos = quebra)
+    ScaleDurabilityLoss = 10,
 }
 
 -- Item Metadata Templates
