@@ -14,7 +14,7 @@ CreateThread(function()
     Wait(2000)
     
     -- Load strains from server
-    local strains = lib.callback.await('ferp_weed:server:getStrains', false)
+    local strains = lib.callback.await('Ferp-Weed:server:getStrains', false)
     if strains then
         Weed.Strains.Created = strains
     end
@@ -32,7 +32,7 @@ CreateThread(function()
 end)
 
 -- Receive strain updates from server
-RegisterNetEvent('ferp_weed:client:loadStrains', function(strains)
+RegisterNetEvent('Ferp-Weed:client:loadStrains', function(strains)
     Weed.Strains.Created = strains
     Weed.Debug("Loaded %d strains", #strains)
 end)

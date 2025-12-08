@@ -160,7 +160,7 @@ local function GetRandomIdle()
 end
 
 -- Start cornering
-RegisterNetEvent('ferp_weed:client:startCornering', function(vehicle)
+RegisterNetEvent('Ferp-Weed:client:startCornering', function(vehicle)
     Weed.Debug("[CORNERING] Evento startCornering recebido, vehicle: %s", vehicle)
     
     if corneringActive then
@@ -193,7 +193,7 @@ RegisterNetEvent('ferp_weed:client:startCornering', function(vehicle)
     end
     
     Weed.Debug("[CORNERING] Zona permitida, chamando callback do servidor")
-    local success = lib.callback.await('ferp_weed:server:startCornering', false, corneringCoords, corneringZone)
+    local success = lib.callback.await('Ferp-Weed:server:startCornering', false, corneringCoords, corneringZone)
     
     if not success then
         Weed.Debug("[CORNERING] Servidor recusou - alguém já vendendo na área")
@@ -268,7 +268,7 @@ function StopCornering()
     corneringZone = nil
     customerThreadActive = false
     
-    TriggerServerEvent('ferp_weed:server:stopCornering')
+    TriggerServerEvent('Ferp-Weed:server:stopCornering')
     Weed.Notify(nil, Lang('notify', 'stopped_selling'), 'info')
 end
 
@@ -330,7 +330,7 @@ function StartCustomerLoop()
     -- Thread principal de aquisição de clientes
     CreateThread(function()
         local notFoundCount = 0
-        local dealerRep = lib.callback.await('ferp_weed:server:getDealerReputation', false)
+        local dealerRep = lib.callback.await('Ferp-Weed:server:getDealerReputation', false)
         local timer = dealerRep and dealerRep.timer or Weed.Cornering.Config.TimeBetweenAcquisition
         
         print('[CORNERING] Timer entre clientes: ' .. timer .. ' segundos')
@@ -420,7 +420,7 @@ function StartCustomerLoop()
                 if roadCoords then
                     corneringPeds[foundPed] = true
                     print('[CORNERING] Enviando cliente para servidor')
-                    TriggerServerEvent('ferp_weed:server:sendCustomer', roadCoords, NetworkGetNetworkIdFromEntity(foundPed))
+                    TriggerServerEvent('Ferp-Weed:server:sendCustomer', roadCoords, NetworkGetNetworkIdFromEntity(foundPed))
                 else
                     print('[CORNERING] ERRO: Não conseguiu encontrar nenhuma posição válida')
                 end
@@ -432,7 +432,7 @@ function StartCustomerLoop()
 end
 
 -- Customer walks to player
-RegisterNetEvent('ferp_weed:client:customerApproach', function(pedNetId, coords)
+RegisterNetEvent('Ferp-Weed:client:customerApproach', function(pedNetId, coords)
     local ped = NetworkGetEntityFromNetworkId(pedNetId)
     
     if not DoesEntityExist(ped) then 
@@ -616,7 +616,7 @@ function SellToCustomer(entity)
     lib.requestAnimDict('mp_safehouselost@', 5000)
     TaskPlayAnim(cache.ped, 'mp_safehouselost@', 'package_dropoff', 8.0, -8.0, -1, 16, 0, false, false, false)
     
-    TriggerServerEvent('ferp_weed:server:customerHandoff', NetworkGetNetworkIdFromEntity(entity))
+    TriggerServerEvent('Ferp-Weed:server:customerHandoff', NetworkGetNetworkIdFromEntity(entity))
     
     Wait(animDuration)
     ClearPedTasks(cache.ped)
@@ -627,7 +627,7 @@ function SellToCustomer(entity)
         local coords = GetEntityCoords(cache.ped)
         
         TriggerServerEvent('evidence:server:CreateFingerDrop', coords)
-        TriggerServerEvent('ferp_weed:server:createEvidence', {
+        TriggerServerEvent('Ferp-Weed:server:createEvidence', {
             coords = vector3(coords.x, coords.y, coords.z - 0.9),
             type = 'weed',
             item = evidences[math.random(#evidences)]
@@ -637,7 +637,7 @@ function SellToCustomer(entity)
     local moneyMult = event.moneyMult or 1.0
     local quantity = event.extraSale and 2 or 1
     
-    TriggerServerEvent('ferp_weed:server:sellBaggie', NetworkGetNetworkIdFromEntity(entity), corneringZone, moneyMult, quantity)
+    TriggerServerEvent('Ferp-Weed:server:sellBaggie', NetworkGetNetworkIdFromEntity(entity), corneringZone, moneyMult, quantity)
     
     if event.extraSale then
         Wait(500)
@@ -648,7 +648,7 @@ function SellToCustomer(entity)
 end
 
 -- Customer handoff animation
-RegisterNetEvent('ferp_weed:client:customerHandoff', function(pedNetId)
+RegisterNetEvent('Ferp-Weed:client:customerHandoff', function(pedNetId)
     local ped = NetworkGetEntityFromNetworkId(pedNetId)
     
     if not DoesEntityExist(ped) then return end
@@ -721,7 +721,7 @@ function PrepareBaggies(vehicle)
     
     if not success then return end
     
-    TriggerServerEvent('ferp_weed:server:prepareBaggies')
+    TriggerServerEvent('Ferp-Weed:server:prepareBaggies')
 end
 
 -- Exports
@@ -730,6 +730,6 @@ exports('SellToCustomer', SellToCustomer)
 exports('PrepareBaggies', PrepareBaggies)
 
 -- Register event handlers
-RegisterNetEvent('ferp_weed:client:stopCornering', StopCornering)
+RegisterNetEvent('Ferp-Weed:client:stopCornering', StopCornering)
 
 Weed.Debug("Client cornering loaded")

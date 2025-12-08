@@ -65,7 +65,7 @@ function SetupVehicleTargets()
             end,
             onSelect = function(data)
                 print('[CORNERING DEBUG] ox_target clicado, disparando evento')
-                TriggerEvent('ferp_weed:client:startCornering', data.entity)
+                TriggerEvent('Ferp-Weed:client:startCornering', data.entity)
             end
         },
         {
@@ -77,7 +77,7 @@ function SetupVehicleTargets()
                 return corneringActive
             end,
             onSelect = function(data)
-                exports.ferp_weed:StopCornering()
+                exports.Ferp-Weed:StopCornering()
             end
         }
     })
@@ -103,7 +103,7 @@ function SetupPedTargets()
                 return true
             end,
             onSelect = function(data)
-                exports.ferp_weed:SellToCustomer(data.entity)
+                exports.Ferp-Weed:SellToCustomer(data.entity)
             end
         }
     })
@@ -115,7 +115,7 @@ function SetupNPCTargets()
         Wait(6000) -- Wait for NPC to spawn
         
         -- Get NPC location from server
-        local npcData = lib.callback.await('ferp_weed:server:getNPCLocation', false)
+        local npcData = lib.callback.await('Ferp-Weed:server:getNPCLocation', false)
         if not npcData then 
             Weed.Debug("No strain NPC data for targets")
             return 
@@ -135,7 +135,7 @@ function SetupNPCTargets()
                     icon = 'fa-solid fa-shop',
                     distance = 2.0,
                     onSelect = function()
-                        exports.ferp_weed:OpenWeedShop()
+                        exports.Ferp-Weed:OpenWeedShop()
                     end
                 },
                 {
@@ -144,7 +144,7 @@ function SetupNPCTargets()
                     icon = 'fa-solid fa-ranking-star',
                     distance = 2.0,
                     onSelect = function()
-                        exports.ferp_weed:ShowStrainRanking()
+                        exports.Ferp-Weed:ShowStrainRanking()
                     end
                 },
                 {
@@ -153,7 +153,7 @@ function SetupNPCTargets()
                     icon = 'fa-solid fa-leaf',
                     distance = 2.0,
                     onSelect = function()
-                        exports.ferp_weed:ManageStrains()
+                        exports.Ferp-Weed:ManageStrains()
                     end
                 }
             }

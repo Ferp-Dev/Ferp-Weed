@@ -1,4 +1,4 @@
-RegisterNetEvent('ferp_weed:client:processBud', function(itemData, slot)
+RegisterNetEvent('Ferp-Weed:client:processBud', function(itemData, slot)
     local success = ShowProgress({
         duration = 8000,
         label = Lang('progress', 'pressing_buds'),
@@ -24,11 +24,11 @@ RegisterNetEvent('ferp_weed:client:processBud', function(itemData, slot)
     
     if not success then return end
     
-    TriggerServerEvent('ferp_weed:server:useItem', 'weed_bud', itemData)
+    TriggerServerEvent('Ferp-Weed:server:useItem', 'weed_bud', itemData)
 end)
 
 -- Open brick into baggies
-RegisterNetEvent('ferp_weed:client:openBrick', function(itemData, slot)
+RegisterNetEvent('Ferp-Weed:client:openBrick', function(itemData, slot)
     local success = ShowProgress({
         duration = 5000,
         label = Lang('progress', 'opening_brick'),
@@ -48,11 +48,11 @@ RegisterNetEvent('ferp_weed:client:openBrick', function(itemData, slot)
     
     if not success then return end
     
-    TriggerServerEvent('ferp_weed:server:useItem', 'weed_brick', itemData)
+    TriggerServerEvent('Ferp-Weed:server:useItem', 'weed_brick', itemData)
 end)
 
 -- Smoke joint
-RegisterNetEvent('ferp_weed:client:smokeJoint', function(quality, slot)
+RegisterNetEvent('Ferp-Weed:client:smokeJoint', function(quality, slot)
     local effectiveness = 1.0 * (quality / 100)
     
     -- Inicia o scenario (já tem prop integrado)
@@ -80,7 +80,7 @@ RegisterNetEvent('ferp_weed:client:smokeJoint', function(quality, slot)
     end
     
     -- Só remove o joint quando terminar de fumar com sucesso
-    TriggerServerEvent('ferp_weed:server:finishSmokingJoint', slot)
+    TriggerServerEvent('Ferp-Weed:server:finishSmokingJoint', slot)
     
     -- Set evidence
     TriggerEvent('evidence:client:SetStatus', 'redeyes', Weed.Items.Config.RedEyesDuration)
@@ -104,7 +104,7 @@ RegisterNetEvent('ferp_weed:client:smokeJoint', function(quality, slot)
 end)
 
 -- Apply joint buffs (for external scripts via export)
-RegisterNetEvent('ferp_weed:client:applyJointBuffs', function(effectiveness)
+RegisterNetEvent('Ferp-Weed:client:applyJointBuffs', function(effectiveness)
     -- Add armor (max 50 com quality 100%)
     local armorBonus = math.ceil(50 * effectiveness)
     local currentArmor = GetPedArmour(cache.ped)
@@ -121,7 +121,7 @@ RegisterNetEvent('ferp_weed:client:applyJointBuffs', function(effectiveness)
 end)
 
 -- Roll joint (combine baggie + paper)
-RegisterNetEvent('ferp_weed:client:rollJoint', function()
+RegisterNetEvent('Ferp-Weed:client:rollJoint', function()
     local input = lib.inputDialog(Lang('menu', 'roll_joint'), {
         {
             type = 'number',
@@ -166,7 +166,7 @@ RegisterNetEvent('ferp_weed:client:rollJoint', function()
     
     if not success then return end
     
-    TriggerServerEvent('ferp_weed:server:combineItems', baggieSlot, paperSlot)
+    TriggerServerEvent('Ferp-Weed:server:combineItems', baggieSlot, paperSlot)
 end)
 
 -- View item quality
@@ -259,7 +259,7 @@ local packagingNPCs = {
 
 -- Get NPC locations from server
 local function GetPackagingNPCLocations()
-    return lib.callback.await('ferp_weed:server:getPackagingNPCLocations', false)
+    return lib.callback.await('Ferp-Weed:server:getPackagingNPCLocations', false)
 end
 
 -- Spawn a packaging NPC
@@ -343,11 +343,11 @@ function ProcessBudsToBrick()
         return 
     end
     
-    TriggerServerEvent('ferp_weed:server:processPackaging', 'buds_to_brick')
+    TriggerServerEvent('Ferp-Weed:server:processPackaging', 'buds_to_brick')
 end
 
 -- Process Brick to Baggies (usando brick do inventário)
-RegisterNetEvent('ferp_weed:client:useBrick', function(brickSlot)
+RegisterNetEvent('Ferp-Weed:client:useBrick', function(brickSlot)
     -- Check for scale and empty baggies
     local hasScale = exports.ox_inventory:Search('count', 'weed_scale') >= 1
     local emptyBaggies = exports.ox_inventory:Search('count', 'empty_baggie')
@@ -382,11 +382,11 @@ RegisterNetEvent('ferp_weed:client:useBrick', function(brickSlot)
         return 
     end
     
-    TriggerServerEvent('ferp_weed:server:useBrick', brickSlot)
+    TriggerServerEvent('Ferp-Weed:server:useBrick', brickSlot)
 end)
 
 -- Process Baggie to Joints (usando saquinho do inventário)
-RegisterNetEvent('ferp_weed:client:useBaggie', function(baggieSlot)
+RegisterNetEvent('Ferp-Weed:client:useBaggie', function(baggieSlot)
     -- Check for rolling paper
     local papers = exports.ox_inventory:Search('count', 'rolling_paper')
     
@@ -415,7 +415,7 @@ RegisterNetEvent('ferp_weed:client:useBaggie', function(baggieSlot)
         return 
     end
     
-    TriggerServerEvent('ferp_weed:server:useBaggie', baggieSlot)
+    TriggerServerEvent('Ferp-Weed:server:useBaggie', baggieSlot)
 end)
 
 -- Add target to NPCs
@@ -640,14 +640,14 @@ function FillWateringCan(slot)
     end
     
     -- Atualizar item no servidor
-    TriggerServerEvent('ferp_weed:server:fillWateringCan', slot)
+    TriggerServerEvent('Ferp-Weed:server:fillWateringCan', slot)
 end
 
 -- Export para ox_target ou uso direto
 exports('FillWateringCan', FillWateringCan)
 
 -- Usar regador do inventário (verifica se precisa encher)
-RegisterNetEvent('ferp_weed:client:useWateringCan', function(slot, metadata)
+RegisterNetEvent('Ferp-Weed:client:useWateringCan', function(slot, metadata)
     local waterLevel = metadata and metadata.water or 0
     
     if waterLevel <= 0 then

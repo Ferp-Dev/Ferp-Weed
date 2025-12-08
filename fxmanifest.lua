@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-name 'ferp_weed'
+name 'Ferp-Weed'
 author 'Ferp.Dev'
 description 'Advanced Weed Growing & Selling System'
 version '1.0.0'

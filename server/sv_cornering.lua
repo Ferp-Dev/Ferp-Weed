@@ -7,7 +7,7 @@ local processingBaggies = {}
 local processingSales = {}
 
 -- Start cornering
-lib.callback.register('ferp_weed:server:startCornering', function(source, coords, zone)
+lib.callback.register('Ferp-Weed:server:startCornering', function(source, coords, zone)
     local Player = QBX:GetPlayer(source)
     if not Player then return false end
     
@@ -35,7 +35,7 @@ lib.callback.register('ferp_weed:server:startCornering', function(source, coords
 end)
 
 -- Stop cornering
-RegisterNetEvent('ferp_weed:server:stopCornering', function()
+RegisterNetEvent('Ferp-Weed:server:stopCornering', function()
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -49,17 +49,17 @@ RegisterNetEvent('ferp_weed:server:stopCornering', function()
 end)
 
 -- Send customer to player
-RegisterNetEvent('ferp_weed:server:sendCustomer', function(coords, pedNetId)
+RegisterNetEvent('Ferp-Weed:server:sendCustomer', function(coords, pedNetId)
     local src = source
     
     if not corneringSessions[src] then return end
     
     -- Trigger client to make ped walk to player
-    TriggerClientEvent('ferp_weed:client:customerApproach', src, pedNetId, coords)
+    TriggerClientEvent('Ferp-Weed:client:customerApproach', src, pedNetId, coords)
 end)
 
 -- Customer handoff animation
-RegisterNetEvent('ferp_weed:server:customerHandoff', function(pedNetId)
+RegisterNetEvent('Ferp-Weed:server:customerHandoff', function(pedNetId)
     local src = source
     
     -- Get ped owner
@@ -70,11 +70,11 @@ RegisterNetEvent('ferp_weed:server:customerHandoff', function(pedNetId)
     if owner == 0 then return end
     
     -- Trigger animation on owner's client
-    TriggerClientEvent('ferp_weed:client:customerHandoff', owner, pedNetId)
+    TriggerClientEvent('Ferp-Weed:client:customerHandoff', owner, pedNetId)
 end)
 
 -- Prepare baggies
-RegisterNetEvent('ferp_weed:server:prepareBaggies', function()
+RegisterNetEvent('Ferp-Weed:server:prepareBaggies', function()
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -138,7 +138,7 @@ RegisterNetEvent('ferp_weed:server:prepareBaggies', function()
 end)
 
 -- Sell baggie to customer
-RegisterNetEvent('ferp_weed:server:sellBaggie', function(pedNetId, zone, moneyMult, quantity)
+RegisterNetEvent('Ferp-Weed:server:sellBaggie', function(pedNetId, zone, moneyMult, quantity)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -257,7 +257,7 @@ RegisterNetEvent('ferp_weed:server:sellBaggie', function(pedNetId, zone, moneyMu
 end)
 
 -- Create evidence
-RegisterNetEvent('ferp_weed:server:createEvidence', function(data)
+RegisterNetEvent('Ferp-Weed:server:createEvidence', function(data)
     local src = source
     
     -- Trigger evidence system if available

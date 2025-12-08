@@ -84,7 +84,7 @@ Complete cannabis growing and selling system for FiveM
 ## 🚀 Installation
 
 ### 1. Download the resource
-Place the `ferp_weed` folder into `resources/[ox]/` or your preferred resources folder.
+Place the `Ferp-Weed` folder into `resources/[ox]/` or your preferred resources folder.
 
 ### 2. Run the SQL
 Execute the `data.sql` file in your MySQL/MariaDB database.
@@ -106,7 +106,7 @@ ensure ox_lib
 ensure ox_inventory
 ensure ox_target
 ensure qbx_core
-ensure ferp_weed
+ensure Ferp-Weed
 ```
 
 ### 5. Restart the server
@@ -313,29 +313,29 @@ Final Price = Base Price × Reputation Bonus × Zone Bonus
 
 ```lua
 -- Plant a seed
-exports['ferp_weed']:PlantSeed()
+exports['Ferp-Weed']:PlantSeed()
 
 -- Harvest a plant
-exports['ferp_weed']:HarvestPlant(entity)
+exports['Ferp-Weed']:HarvestPlant(entity)
 
 -- Water a plant
-exports['ferp_weed']:WaterPlant(entity)
+exports['Ferp-Weed']:WaterPlant(entity)
 
 -- Fertilize a plant
-exports['ferp_weed']:FertilizePlant(entity, nutrient)
+exports['Ferp-Weed']:FertilizePlant(entity, nutrient)
 
 -- Smoke a joint
-exports['ferp_weed']:SmokeJoint()
+exports['Ferp-Weed']:SmokeJoint()
 ```
 
 ### Server Exports
 
 ```lua
 -- Check if player has red eyes
-exports['ferp_weed']:HasRedEyes(source)
+exports['Ferp-Weed']:HasRedEyes(source)
 
 -- Check if player smells like weed
-exports['ferp_weed']:SmellsLikeWeed(source)
+exports['Ferp-Weed']:SmellsLikeWeed(source)
 ```
 
 ---

@@ -53,10 +53,10 @@ AddEventHandler('QBCore:Server:PlayerLoaded', function(Player)
     local src = Player.PlayerData.source
     
     -- Load player strains
-    TriggerClientEvent('ferp_weed:client:loadStrains', src, Weed.Strains.Created)
+    TriggerClientEvent('Ferp-Weed:client:loadStrains', src, Weed.Strains.Created)
     
     -- Load all active plants
-    TriggerClientEvent('ferp_weed:client:loadPlants', src, Weed.Plants.Active)
+    TriggerClientEvent('Ferp-Weed:client:loadPlants', src, Weed.Plants.Active)
 end)
 
 -- Also handle player spawn for qbx
@@ -64,26 +64,26 @@ RegisterNetEvent('qbx_core:server:playerLoaded', function()
     local src = source
     
     -- Load player strains
-    TriggerClientEvent('ferp_weed:client:loadStrains', src, Weed.Strains.Created)
+    TriggerClientEvent('Ferp-Weed:client:loadStrains', src, Weed.Strains.Created)
     
     -- Load all active plants
-    TriggerClientEvent('ferp_weed:client:loadPlants', src, Weed.Plants.Active)
+    TriggerClientEvent('Ferp-Weed:client:loadPlants', src, Weed.Plants.Active)
 end)
 
 -- Callbacks
-lib.callback.register('ferp_weed:server:getTime', function(source)
+lib.callback.register('Ferp-Weed:server:getTime', function(source)
     return os.time()
 end)
 
-lib.callback.register('ferp_weed:server:getStrains', function(source)
+lib.callback.register('Ferp-Weed:server:getStrains', function(source)
     return Weed.Strains.Created
 end)
 
-lib.callback.register('ferp_weed:server:getPlants', function(source)
+lib.callback.register('Ferp-Weed:server:getPlants', function(source)
     return Weed.Plants.Active
 end)
 
-lib.callback.register('ferp_weed:server:getDealerReputation', function(source, citizenid)
+lib.callback.register('Ferp-Weed:server:getDealerReputation', function(source, citizenid)
     local Player = QBX:GetPlayer(source)
     if not Player then return nil end
     
@@ -92,7 +92,7 @@ lib.callback.register('ferp_weed:server:getDealerReputation', function(source, c
 end)
 
 -- Inventory Item Use Events
-RegisterNetEvent('ferp_weed:server:useItem', function(itemName, itemData)
+RegisterNetEvent('Ferp-Weed:server:useItem', function(itemName, itemData)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -103,11 +103,11 @@ RegisterNetEvent('ferp_weed:server:useItem', function(itemName, itemData)
         
     elseif itemName == 'weed_brick' then
         -- Brick - envia para client verificar balança e saquinhos
-        TriggerClientEvent('ferp_weed:client:useBrick', src, itemData.slot)
+        TriggerClientEvent('Ferp-Weed:client:useBrick', src, itemData.slot)
         
     elseif itemName == 'weed_baggie' then
         -- Baggie - envia para client verificar papel
-        TriggerClientEvent('ferp_weed:client:useBaggie', src, itemData.slot)
+        TriggerClientEvent('Ferp-Weed:client:useBaggie', src, itemData.slot)
         
     elseif itemName == 'joint' then
         -- Smoke joint - item só é removido quando terminar de fumar
@@ -115,12 +115,12 @@ RegisterNetEvent('ferp_weed:server:useItem', function(itemName, itemData)
         local quality = itemData.metadata.quality or 50
         
         -- Envia pro client começar a fumar (item ainda no inventário)
-        TriggerClientEvent('ferp_weed:client:smokeJoint', src, quality, slot)
+        TriggerClientEvent('Ferp-Weed:client:smokeJoint', src, quality, slot)
     end
 end)
 
 -- Terminou de fumar o joint com sucesso - agora remove o item
-RegisterNetEvent('ferp_weed:server:finishSmokingJoint', function(slot)
+RegisterNetEvent('Ferp-Weed:server:finishSmokingJoint', function(slot)
     local src = source
     
     -- Verifica se ainda tem o joint no slot
@@ -134,7 +134,7 @@ RegisterNetEvent('ferp_weed:server:finishSmokingJoint', function(slot)
 end)
 
 -- Combine items (rolling joint from baggie)
-RegisterNetEvent('ferp_weed:server:combineItems', function(baggieSlot, paperSlot)
+RegisterNetEvent('Ferp-Weed:server:combineItems', function(baggieSlot, paperSlot)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -325,7 +325,7 @@ lib.addCommand('reloadstrains', {
     end
     
     -- Broadcast to all clients
-    TriggerClientEvent('ferp_weed:client:loadStrains', -1, Weed.Strains.Created)
+    TriggerClientEvent('Ferp-Weed:client:loadStrains', -1, Weed.Strains.Created)
     
     Weed.Notify(source, string.format('Recarregado %d strains', strains and #strains or 0), 'success')
 end)

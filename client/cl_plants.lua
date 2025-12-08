@@ -67,7 +67,7 @@ end
 
 -- Get current unix timestamp
 local function GetCurrentTime()
-    return lib.callback.await('ferp_weed:server:getTime', false) or 0
+    return lib.callback.await('Ferp-Weed:server:getTime', false) or 0
 end
 
 
@@ -106,7 +106,7 @@ local function GetPlantByEntity(entity)
     -- First: check if entity is directly in SpawnedPlants
     for plantId, spawnedEntity in pairs(SpawnedPlants) do
         if spawnedEntity == entity then
-            local plantData = lib.callback.await('ferp_weed:server:getPlantById', false, plantId)
+            local plantData = lib.callback.await('Ferp-Weed:server:getPlantById', false, plantId)
             if plantData then
                 plantData.entity = entity
                 return plantData
@@ -129,7 +129,7 @@ local function GetPlantByEntity(entity)
     end
     
     if closestPlantId then
-        local plantData = lib.callback.await('ferp_weed:server:getPlantById', false, closestPlantId)
+        local plantData = lib.callback.await('Ferp-Weed:server:getPlantById', false, closestPlantId)
         if plantData then
             plantData.entity = entity
             -- Update SpawnedPlants for future exact matches
@@ -139,7 +139,7 @@ local function GetPlantByEntity(entity)
     end
     
     -- Fallback: search by coordinates on server
-    local plantData = lib.callback.await('ferp_weed:server:getPlantByCoords', false, entityCoords)
+    local plantData = lib.callback.await('Ferp-Weed:server:getPlantByCoords', false, entityCoords)
     if plantData then
         PlantData[plantData.id] = {
             coords = plantData.coords,
@@ -170,7 +170,7 @@ function CheckPlant(entity)
     local citizenid = Player.citizenid
     
     -- Debug strain info
-    print(string.format("[FERP_WEED] CheckPlant - strain ID: %s", tostring(plant.metadata.strain)))
+    print(string.format("[Ferp-Weed] CheckPlant - strain ID: %s", tostring(plant.metadata.strain)))
     
     -- Get strain name - check if plant has a valid strain ID
     local strainId = plant.metadata.strain
@@ -184,19 +184,19 @@ function CheckPlant(entity)
         if strain and strain.name then
             strainName = strain.name
             hasCustomStrain = true
-            print(string.format("[FERP_WEED] Found custom strain: %s", strainName))
+            print(string.format("[Ferp-Weed] Found custom strain: %s", strainName))
         else
             -- Strain exists but not loaded on client - use saved name or generate
             strainName = plant.metadata.strain_name or Weed.Strains.GenerateName(plant.metadata.n or 0.5, plant.metadata.p or 0.5, plant.metadata.k or 0.5)
             hasCustomStrain = true
-            print(string.format("[FERP_WEED] Strain %d not in cache, using: %s", strainId, strainName))
+            print(string.format("[Ferp-Weed] Strain %d not in cache, using: %s", strainId, strainName))
         end
     elseif strainId and strainId < 0 then
         -- Default strain
         strain = Weed.Strains.GetDefaultById(strainId)
         if strain then
             strainName = strain.name
-            print(string.format("[FERP_WEED] Found default strain: %s (can be replaced)", strainName))
+            print(string.format("[Ferp-Weed] Found default strain: %s (can be replaced)", strainName))
         else
             strainName = plant.metadata.strain_name or Lang('plant', 'unknown_strain')
         end
@@ -204,7 +204,7 @@ function CheckPlant(entity)
     else
         -- No strain yet
         strainName = Lang('plant', 'no_strain')
-        print(string.format("[FERP_WEED] No strain assigned"))
+        print(string.format("[Ferp-Weed] No strain assigned"))
     end
     
     -- Build context menu options
@@ -380,7 +380,7 @@ function HarvestPlant(entity, plantId)
     })
     
     if success then
-        TriggerServerEvent('ferp_weed:server:harvestPlant', plant.id)
+        TriggerServerEvent('Ferp-Weed:server:harvestPlant', plant.id)
     end
 end
 exports('HarvestPlant', HarvestPlant)
@@ -450,7 +450,7 @@ function WaterPlant(entity, plantId)
     waterActive = false
     
     if success then
-        TriggerServerEvent('ferp_weed:server:waterPlant', plantId)
+        TriggerServerEvent('Ferp-Weed:server:waterPlant', plantId)
         Wait(500)
         CheckPlant(entity)
     end
@@ -517,7 +517,7 @@ function ApplyFertilizerBoost(entity, plantId)
     })
     
     if success then
-        TriggerServerEvent('ferp_weed:server:applyFertilizer', plantId)
+        TriggerServerEvent('Ferp-Weed:server:applyFertilizer', plantId)
         -- Refresh menu
         Wait(500)
         CheckPlant(entity)
@@ -557,7 +557,7 @@ function ApplyStrain(entity, plantId, strain, isNew)
     })
     
     if success then
-        TriggerServerEvent('ferp_weed:server:createStrain', plantId, strain, isNew)
+        TriggerServerEvent('Ferp-Weed:server:createStrain', plantId, strain, isNew)
         -- Refresh menu
         Wait(500)
         CheckPlant(entity)
@@ -591,7 +591,7 @@ function MakePlantMale(entity, plantId)
     })
     
     if success then
-        TriggerServerEvent('ferp_weed:server:makePlantMale', plantId)
+        TriggerServerEvent('Ferp-Weed:server:makePlantMale', plantId)
         -- Refresh menu
         Wait(500)
         CheckPlant(entity)
@@ -619,7 +619,7 @@ function DestroyPlant(entity, plantId)
     })
     
     if success then
-        TriggerServerEvent('ferp_weed:server:destroyPlant', plantId)
+        TriggerServerEvent('Ferp-Weed:server:destroyPlant', plantId)
     end
 end
 exports('DestroyPlant', DestroyPlant)
@@ -628,9 +628,9 @@ exports('DestroyPlant', DestroyPlant)
 -- ox_inventory export format varies, need to handle multiple cases
 function PlantSeed(data, slot)
     -- Debug
-    print("[FERP_WEED] ========== PlantSeed ==========")
-    print("[FERP_WEED] data type: " .. type(data))
-    print("[FERP_WEED] slot: " .. tostring(slot))
+    print("[Ferp-Weed] ========== PlantSeed ==========")
+    print("[Ferp-Weed] data type: " .. type(data))
+    print("[Ferp-Weed] slot: " .. tostring(slot))
     
     -- Try to find the item data - ox_inventory may pass it differently
     local itemData = nil
@@ -639,12 +639,12 @@ function PlantSeed(data, slot)
     -- Case 1: data is the full item object with metadata
     if type(data) == "table" and data.metadata then
         itemData = data
-        print("[FERP_WEED] Case 1: data has metadata directly")
+        print("[Ferp-Weed] Case 1: data has metadata directly")
     
     -- Case 2: data has slot info, need to search inventory
     elseif type(data) == "table" and data.slot then
         itemSlot = data.slot
-        print("[FERP_WEED] Case 2: data has slot=" .. tostring(itemSlot))
+        print("[Ferp-Weed] Case 2: data has slot=" .. tostring(itemSlot))
     end
     
     -- If we still don't have itemData, search inventory for weed_seed_female
@@ -664,7 +664,7 @@ function PlantSeed(data, slot)
             if not itemData then
                 itemData = items[1]
             end
-            print(string.format("[FERP_WEED] Found seed via Search - slot: %s, strain: %s", 
+            print(string.format("[Ferp-Weed] Found seed via Search - slot: %s, strain: %s", 
                 tostring(itemData and itemData.slot), 
                 tostring(itemData and itemData.metadata and itemData.metadata.strain)))
         end
@@ -672,14 +672,14 @@ function PlantSeed(data, slot)
     
     -- Final debug
     if itemData and itemData.metadata then
-        print(string.format("[FERP_WEED] Seed metadata - strain: %s, strain_name: %s, n: %s", 
+        print(string.format("[Ferp-Weed] Seed metadata - strain: %s, strain_name: %s, n: %s", 
             tostring(itemData.metadata.strain),
             tostring(itemData.metadata.strain_name),
             tostring(itemData.metadata.n)))
     else
-        print("[FERP_WEED] WARNING: No metadata found for seed!")
+        print("[Ferp-Weed] WARNING: No metadata found for seed!")
     end
-    print("[FERP_WEED] ================================")
+    print("[Ferp-Weed] ================================")
     
     -- Check if player is outside
     if IsPlayerInBuilding() then
@@ -828,7 +828,7 @@ function PlantSeed(data, slot)
         if itemData.metadata.strain and itemData.metadata.strain ~= 0 then
             modifiers.strain = itemData.metadata.strain
             modifiers.strain_name = itemData.metadata.strain_name
-            print(string.format("[FERP_WEED] Using strain ID %d from seed", modifiers.strain))
+            print(string.format("[Ferp-Weed] Using strain ID %d from seed", modifiers.strain))
             
             -- If positive
             if itemData.metadata.strain > 0 then
@@ -851,7 +851,7 @@ function PlantSeed(data, slot)
         end
     end
     
-    print(string.format("[FERP_WEED] Planting with modifiers - strain: %s, n: %.2f, p: %.2f, k: %.2f", 
+    print(string.format("[Ferp-Weed] Planting with modifiers - strain: %s, n: %.2f, p: %.2f, k: %.2f", 
         tostring(modifiers.strain), modifiers.n or 0, modifiers.p or 0, modifiers.k or 0))
     
     -- Face the plant location
@@ -875,7 +875,7 @@ function PlantSeed(data, slot)
     })
     
     if success then
-        TriggerServerEvent('ferp_weed:server:plantSeed', finalCoords, finalHeading, modifiers, slot)
+        TriggerServerEvent('Ferp-Weed:server:plantSeed', finalCoords, finalHeading, modifiers, slot)
         return true -- Tell ox_inventory to consume the item
     end
     
@@ -903,7 +903,7 @@ end
 ]]--
 
 -- Spawn plant from server data
-RegisterNetEvent('ferp_weed:client:spawnPlant', function(data)
+RegisterNetEvent('Ferp-Weed:client:spawnPlant', function(data)
     if not data then return end
     
     local plantId = data.id
@@ -936,7 +936,7 @@ RegisterNetEvent('ferp_weed:client:spawnPlant', function(data)
 end)
 
 -- Remove plant
-RegisterNetEvent('ferp_weed:client:removePlant', function(plantId)
+RegisterNetEvent('Ferp-Weed:client:removePlant', function(plantId)
     if not plantId then return end
     
     -- Remove from chunk
@@ -959,7 +959,7 @@ RegisterNetEvent('ferp_weed:client:removePlant', function(plantId)
 end)
 
 -- Update plant model (growth stage change)
-RegisterNetEvent('ferp_weed:client:updatePlant', function(plantId, newModel)
+RegisterNetEvent('Ferp-Weed:client:updatePlant', function(plantId, newModel)
     if not plantId or not newModel then return end
     
     -- Update stored data
@@ -984,7 +984,7 @@ RegisterNetEvent('ferp_weed:client:updatePlant', function(plantId, newModel)
 end)
 
 -- Batch update plants (optimized for multiple updates)
-RegisterNetEvent('ferp_weed:client:batchUpdatePlants', function(updates)
+RegisterNetEvent('Ferp-Weed:client:batchUpdatePlants', function(updates)
     if not updates then return end
     
     for plantId, newModel in pairs(updates) do
@@ -1011,7 +1011,7 @@ RegisterNetEvent('ferp_weed:client:batchUpdatePlants', function(updates)
 end)
 
 -- Batch remove plants (optimized for cleanup)
-RegisterNetEvent('ferp_weed:client:batchRemovePlants', function(plantIds)
+RegisterNetEvent('Ferp-Weed:client:batchRemovePlants', function(plantIds)
     if not plantIds then return end
     
     for _, plantId in ipairs(plantIds) do
@@ -1036,7 +1036,7 @@ RegisterNetEvent('ferp_weed:client:batchRemovePlants', function(plantIds)
 end)
 
 -- Load existing plants when player joins
-RegisterNetEvent('ferp_weed:client:loadPlants', function(plants)
+RegisterNetEvent('Ferp-Weed:client:loadPlants', function(plants)
     if not plants then return end
     
     -- Clear existing data
@@ -1163,7 +1163,7 @@ CreateThread(function()
     print('[WEED CLIENT] Requesting plants from server...')
     
     -- Request plants from server
-    local plants = lib.callback.await('ferp_weed:server:getPlants', false)
+    local plants = lib.callback.await('Ferp-Weed:server:getPlants', false)
     
     if plants then
         local count = 0

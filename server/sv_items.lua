@@ -28,7 +28,7 @@ AddEventHandler('onResourceStart', function(resourceName)
 end)
 
 -- Callback to get NPC locations
-lib.callback.register('ferp_weed:server:getPackagingNPCLocations', function(source)
+lib.callback.register('Ferp-Weed:server:getPackagingNPCLocations', function(source)
     return packagingNPCLocations
 end)
 
@@ -43,7 +43,7 @@ local function getStrain(strainId)
 end
 
 -- Process packaging (from NPC - faz bricks de todas as strains automaticamente)
-RegisterNetEvent('ferp_weed:server:processPackaging', function(processType)
+RegisterNetEvent('Ferp-Weed:server:processPackaging', function(processType)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -119,7 +119,7 @@ RegisterNetEvent('ferp_weed:server:processPackaging', function(processType)
 end)
 
 -- Use brick from inventory (precisa de balança + saquinhos vazios)
-RegisterNetEvent('ferp_weed:server:useBrick', function(brickSlot)
+RegisterNetEvent('Ferp-Weed:server:useBrick', function(brickSlot)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -182,7 +182,7 @@ RegisterNetEvent('ferp_weed:server:useBrick', function(brickSlot)
 end)
 
 -- Use baggie from inventory (precisa de papel)
-RegisterNetEvent('ferp_weed:server:useBaggie', function(baggieSlot)
+RegisterNetEvent('Ferp-Weed:server:useBaggie', function(baggieSlot)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -236,14 +236,14 @@ end)
 -- Export: Use weed_brick
 exports('useWeedBrick', function(event, item, inventory, slot, data)
     local src = inventory.id
-    TriggerClientEvent('ferp_weed:client:useBrick', src, slot)
+    TriggerClientEvent('Ferp-Weed:client:useBrick', src, slot)
     return false 
 end)
 
 -- Export: Use weed_baggie
 exports('useWeedBaggie', function(event, item, inventory, slot, data)
     local src = inventory.id
-    TriggerClientEvent('ferp_weed:client:useBaggie', src, slot)
+    TriggerClientEvent('Ferp-Weed:client:useBaggie', src, slot)
     return false 
 end)
 
@@ -252,7 +252,7 @@ exports('useJoint', function(event, item, inventory, slot, data)
     local src = inventory.id
     
     local quality = item.metadata and item.metadata.quality or 50
-    TriggerClientEvent('ferp_weed:client:smokeJoint', src, quality, slot)
+    TriggerClientEvent('Ferp-Weed:client:smokeJoint', src, quality, slot)
     
     return false
 end)
@@ -262,13 +262,13 @@ exports('useWateringCan', function(event, item, inventory, slot, data)
     local src = inventory.id
     local waterLevel = item.metadata and item.metadata.water or 0
     
-    TriggerClientEvent('ferp_weed:client:useWateringCan', src, slot, item.metadata)
+    TriggerClientEvent('Ferp-Weed:client:useWateringCan', src, slot, item.metadata)
     
     return false
 end)
 
 -- Encher regador com água
-RegisterNetEvent('ferp_weed:server:fillWateringCan', function(slot)
+RegisterNetEvent('Ferp-Weed:server:fillWateringCan', function(slot)
     local src = source
     local Player = exports.qbx_core:GetPlayer(src)
     if not Player then return end
@@ -296,7 +296,7 @@ end)
 -- ============================================
 
 -- Set red eyes evidence on a player
--- Usage: exports.ferp_weed:SetRedEyes(playerId, duration)
+-- Usage: exports.Ferp-Weed:SetRedEyes(playerId, duration)
 -- duration in seconds (optional, defaults to config)
 exports('SetRedEyes', function(playerId, duration)
     local dur = duration or Weed.Items.Config.RedEyesDuration
@@ -305,7 +305,7 @@ exports('SetRedEyes', function(playerId, duration)
 end)
 
 -- Set weed smell evidence on a player
--- Usage: exports.ferp_weed:SetWeedSmell(playerId, duration)
+-- Usage: exports.Ferp-Weed:SetWeedSmell(playerId, duration)
 -- duration in seconds (optional, defaults to config)
 exports('SetWeedSmell', function(playerId, duration)
     local dur = duration or Weed.Items.Config.WeedSmellDuration
@@ -314,7 +314,7 @@ exports('SetWeedSmell', function(playerId, duration)
 end)
 
 -- Set both red eyes and weed smell
--- Usage: exports.ferp_weed:SetWeedEvidence(playerId, eyesDuration, smellDuration)
+-- Usage: exports.Ferp-Weed:SetWeedEvidence(playerId, eyesDuration, smellDuration)
 exports('SetWeedEvidence', function(playerId, eyesDuration, smellDuration)
     local eyesDur = eyesDuration or Weed.Items.Config.RedEyesDuration
     local smellDur = smellDuration or Weed.Items.Config.WeedSmellDuration
@@ -324,7 +324,7 @@ exports('SetWeedEvidence', function(playerId, eyesDuration, smellDuration)
 end)
 
 -- Clear weed evidence from a player
--- Usage: exports.ferp_weed:ClearWeedEvidence(playerId)
+-- Usage: exports.Ferp-Weed:ClearWeedEvidence(playerId)
 exports('ClearWeedEvidence', function(playerId)
     TriggerClientEvent('evidence:client:SetStatus', playerId, 'redeyes', 0)
     TriggerClientEvent('evidence:client:SetStatus', playerId, 'weedsmell', 0)
@@ -332,7 +332,7 @@ exports('ClearWeedEvidence', function(playerId)
 end)
 
 -- Get joint buff values (for other scripts to use same values)
--- Usage: local buffs = exports.ferp_weed:GetJointBuffs()
+-- Usage: local buffs = exports.Ferp-Weed:GetJointBuffs()
 exports('GetJointBuffs', function()
     return {
         duration = Weed.Items.Config.JointDuration,
@@ -345,7 +345,7 @@ exports('GetJointBuffs', function()
 end)
 
 -- Apply joint buffs to a player (armor + stress reduction)
--- Usage: exports.ferp_weed:ApplyJointBuffs(playerId, quality)
+-- Usage: exports.Ferp-Weed:ApplyJointBuffs(playerId, quality)
 -- quality = 1-100 (affects buff strength)
 exports('ApplyJointBuffs', function(playerId, quality)
     local q = quality or 50
@@ -356,7 +356,7 @@ exports('ApplyJointBuffs', function(playerId, quality)
     TriggerClientEvent('evidence:client:SetStatus', playerId, 'weedsmell', Weed.Items.Config.WeedSmellDuration)
     
     -- Apply buffs via client
-    TriggerClientEvent('ferp_weed:client:applyJointBuffs', playerId, effectiveness)
+    TriggerClientEvent('Ferp-Weed:client:applyJointBuffs', playerId, effectiveness)
     
     return true
 end)

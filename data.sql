@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `weed_dealers` (
     description = 'Female seed for planting',
     client = {
         usetime = 5000,
-        export = 'ferp_weed.PlantSeed'
+        export = 'Ferp-Weed.PlantSeed'
     }
 },
 
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `weed_dealers` (
     description = 'Weed joint ready to smoke',
     client = {
         usetime = 2000,
-        export = 'ferp_weed.SmokeJoint'
+        export = 'Ferp-Weed.SmokeJoint'
     }
 },
 

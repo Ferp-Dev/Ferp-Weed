@@ -14,7 +14,7 @@ AddEventHandler('onResourceStart', function(resourceName)
 end)
 
 -- Callback para cliente obter localização do NPC
-lib.callback.register('ferp_weed:server:getNPCLocation', function(source)
+lib.callback.register('Ferp-Weed:server:getNPCLocation', function(source)
     return currentNPCLocation
 end)
 
@@ -67,7 +67,7 @@ function Weed.Strains.Create(citizenid, strainData)
     UpdateStrainRankings()
     
     -- Broadcast to all clients
-    TriggerClientEvent('ferp_weed:client:loadStrains', -1, Weed.Strains.Created)
+    TriggerClientEvent('Ferp-Weed:client:loadStrains', -1, Weed.Strains.Created)
     
     Weed.Debug("Strain %d created by %s", insertId, citizenid)
     return true
@@ -113,11 +113,11 @@ function UpdateStrainRankings()
     end
     
     -- Broadcast to all clients
-    TriggerClientEvent('ferp_weed:client:loadStrains', -1, Weed.Strains.Created)
+    TriggerClientEvent('Ferp-Weed:client:loadStrains', -1, Weed.Strains.Created)
 end
 
 -- Rename strain
-RegisterNetEvent('ferp_weed:server:renameStrain', function(strainId, newName)
+RegisterNetEvent('Ferp-Weed:server:renameStrain', function(strainId, newName)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -164,14 +164,14 @@ RegisterNetEvent('ferp_weed:server:renameStrain', function(strainId, newName)
     strain.renamed = true
     
     -- Broadcast to all clients
-    TriggerClientEvent('ferp_weed:client:loadStrains', -1, Weed.Strains.Created)
+    TriggerClientEvent('Ferp-Weed:client:loadStrains', -1, Weed.Strains.Created)
     
     Weed.Notify(src, Lang('notify', 'strain_renamed'), 'success')
     Weed.Debug("Strain %d renamed to %s", strainId, newName)
 end)
 
 -- Delete strain
-RegisterNetEvent('ferp_weed:server:deleteStrain', function(strainId)
+RegisterNetEvent('Ferp-Weed:server:deleteStrain', function(strainId)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -202,20 +202,20 @@ RegisterNetEvent('ferp_weed:server:deleteStrain', function(strainId)
     UpdateStrainRankings()
     
     -- Broadcast to all clients
-    TriggerClientEvent('ferp_weed:client:loadStrains', -1, Weed.Strains.Created)
+    TriggerClientEvent('Ferp-Weed:client:loadStrains', -1, Weed.Strains.Created)
     
     Weed.Notify(src, Lang('notify', 'strain_deleted'), 'success')
     Weed.Debug("Strain %d deleted", strainId)
 end)
 
 -- Open weed shop (using ox_inventory shop)
-RegisterNetEvent('ferp_weed:server:openShop', function()
+RegisterNetEvent('Ferp-Weed:server:openShop', function()
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
     
     -- Open ox_inventory shop - send to client
-    TriggerClientEvent('ferp_weed:client:openShop', src)
+    TriggerClientEvent('Ferp-Weed:client:openShop', src)
 end)
 
 -- Load strains from database on startup
@@ -257,7 +257,7 @@ CreateThread(function()
     end
     
     -- Broadcast to all online players
-    TriggerClientEvent('ferp_weed:client:loadStrains', -1, Weed.Strains.Created)
+    TriggerClientEvent('Ferp-Weed:client:loadStrains', -1, Weed.Strains.Created)
 end)
 
 -- Periodic strain updates
@@ -269,7 +269,7 @@ CreateThread(function()
         UpdateStrainRankings()
         
         -- Broadcast to all clients
-        TriggerClientEvent('ferp_weed:client:loadStrains', -1, Weed.Strains.Created)
+        TriggerClientEvent('Ferp-Weed:client:loadStrains', -1, Weed.Strains.Created)
         
         Weed.Debug("Strain rankings updated")
     end

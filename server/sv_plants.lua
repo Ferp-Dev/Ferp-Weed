@@ -1,7 +1,7 @@
 local QBX = exports.qbx_core
 
 -- Plant seed
-RegisterNetEvent('ferp_weed:server:plantSeed', function(coords, heading, modifiers, slot)
+RegisterNetEvent('Ferp-Weed:server:plantSeed', function(coords, heading, modifiers, slot)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -75,7 +75,7 @@ RegisterNetEvent('ferp_weed:server:plantSeed', function(coords, heading, modifie
     }
     
     -- Spawn for all clients
-    TriggerClientEvent('ferp_weed:client:spawnPlant', -1, {
+    TriggerClientEvent('Ferp-Weed:client:spawnPlant', -1, {
         id = plantId,
         coords = coords,
         heading = heading,
@@ -87,7 +87,7 @@ RegisterNetEvent('ferp_weed:server:plantSeed', function(coords, heading, modifie
 end)
 
 -- Get plant data by netId
-lib.callback.register('ferp_weed:server:getPlant', function(source, netId)
+lib.callback.register('Ferp-Weed:server:getPlant', function(source, netId)
     -- Find plant by network ID or entity
     for plantId, plant in pairs(Weed.Plants.Active) do
         if plant.netId == netId then
@@ -100,7 +100,7 @@ lib.callback.register('ferp_weed:server:getPlant', function(source, netId)
 end)
 
 -- Get plant data by ID
-lib.callback.register('ferp_weed:server:getPlantById', function(source, plantId)
+lib.callback.register('Ferp-Weed:server:getPlantById', function(source, plantId)
     if Weed.Plants.Active[plantId] then
         return Weed.Plants.Active[plantId]
     end
@@ -108,7 +108,7 @@ lib.callback.register('ferp_weed:server:getPlantById', function(source, plantId)
 end)
 
 -- Get plant data by coordinates (fallback search)
-lib.callback.register('ferp_weed:server:getPlantByCoords', function(source, coords)
+lib.callback.register('Ferp-Weed:server:getPlantByCoords', function(source, coords)
     local searchCoords = type(coords) == 'vector3' and coords or vector3(coords.x, coords.y, coords.z)
     
     for plantId, plant in pairs(Weed.Plants.Active) do
@@ -123,7 +123,7 @@ lib.callback.register('ferp_weed:server:getPlantByCoords', function(source, coor
 end)
 
 -- Water plant
-RegisterNetEvent('ferp_weed:server:waterPlant', function(plantId)
+RegisterNetEvent('Ferp-Weed:server:waterPlant', function(plantId)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then 
@@ -206,7 +206,7 @@ RegisterNetEvent('ferp_weed:server:waterPlant', function(plantId)
 end)
 
 -- Apply fertilizer (boost growth - one time use, 25% faster)
-RegisterNetEvent('ferp_weed:server:applyFertilizer', function(plantId)
+RegisterNetEvent('Ferp-Weed:server:applyFertilizer', function(plantId)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -252,7 +252,7 @@ RegisterNetEvent('ferp_weed:server:applyFertilizer', function(plantId)
 end)
 
 -- Create strain on plant (requires strain_modifier item)
-RegisterNetEvent('ferp_weed:server:createStrain', function(plantId, strainData, isNew)
+RegisterNetEvent('Ferp-Weed:server:createStrain', function(plantId, strainData, isNew)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -312,7 +312,7 @@ RegisterNetEvent('ferp_weed:server:createStrain', function(plantId, strainData, 
 end)
 
 -- Make plant male
-RegisterNetEvent('ferp_weed:server:makePlantMale', function(plantId)
+RegisterNetEvent('Ferp-Weed:server:makePlantMale', function(plantId)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -347,7 +347,7 @@ RegisterNetEvent('ferp_weed:server:makePlantMale', function(plantId)
 end)
 
 -- Harvest plant
-RegisterNetEvent('ferp_weed:server:harvestPlant', function(plantId)
+RegisterNetEvent('Ferp-Weed:server:harvestPlant', function(plantId)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -411,19 +411,19 @@ RegisterNetEvent('ferp_weed:server:harvestPlant', function(plantId)
             -- Remove plant
             MySQL.update('DELETE FROM weed_plants WHERE id = ?', {plantId})
             Weed.Plants.Active[plantId] = nil
-            TriggerClientEvent('ferp_weed:client:removePlant', -1, plantId)
+            TriggerClientEvent('Ferp-Weed:client:removePlant', -1, plantId)
         end
         
         local seedCount = math.random(Weed.Plants.Config.SeedsFromMale[1], Weed.Plants.Config.SeedsFromMale[2])
         
-        print(string.format("[FERP_WEED] Harvesting male - strain ID: %d, name: %s", strain.id or 0, strain.name or "NONE"))
+        print(string.format("[Ferp-Weed] Harvesting male - strain ID: %d, name: %s", strain.id or 0, strain.name or "NONE"))
         
         for i = 1, seedCount do
             if math.random() <= Weed.Plants.Config.MaleChance then
                 Weed.AddItem(src, 'weed_seed_male', 1)
             else
                 local metadata = Weed.Items.CreateMetadata('weed_seed_female', strain, quality)
-                print(string.format("[FERP_WEED] Created seed metadata: strain=%d, strain_name=%s, n=%.2f", 
+                print(string.format("[Ferp-Weed] Created seed metadata: strain=%d, strain_name=%s, n=%.2f", 
                     metadata.strain or 0, metadata.strain_name or "NONE", metadata.n or 0))
                 Weed.AddItem(src, 'weed_seed_female', 1, metadata)
             end
@@ -448,7 +448,7 @@ RegisterNetEvent('ferp_weed:server:harvestPlant', function(plantId)
 end)
 
 -- Destroy plant
-RegisterNetEvent('ferp_weed:server:destroyPlant', function(plantId)
+RegisterNetEvent('Ferp-Weed:server:destroyPlant', function(plantId)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then return end
@@ -475,7 +475,7 @@ RegisterNetEvent('ferp_weed:server:destroyPlant', function(plantId)
     Weed.Plants.Active[plantId] = nil
     
     -- Remove for all clients
-    TriggerClientEvent('ferp_weed:client:removePlant', -1, plantId)
+    TriggerClientEvent('Ferp-Weed:client:removePlant', -1, plantId)
     
     Weed.Notify(src, Lang('notify', 'plant_removed'), 'success')
     Weed.Debug("Plant %d destroyed by %s", plantId, Player.PlayerData.citizenid)
@@ -565,7 +565,7 @@ CreateThread(function()
         
         -- Send batch update to clients
         if next(updatedPlants) then
-            TriggerClientEvent('ferp_weed:client:batchUpdatePlants', -1, updatedPlants)
+            TriggerClientEvent('Ferp-Weed:client:batchUpdatePlants', -1, updatedPlants)
             Weed.Debug("Batch updated %d plants", TableCount(updatedPlants))
         end
     end
@@ -598,7 +598,7 @@ CreateThread(function()
             MySQL.update('DELETE FROM weed_plants WHERE expires_at < ?', {currentTime})
             
             -- Notify clients in batch
-            TriggerClientEvent('ferp_weed:client:batchRemovePlants', -1, expiredIds)
+            TriggerClientEvent('Ferp-Weed:client:batchRemovePlants', -1, expiredIds)
             
             Weed.Debug("Cleaned up %d expired plants", #expiredIds)
         end

@@ -4,7 +4,7 @@ local currentNPCData = nil
 
 -- Get current NPC location from server
 local function GetNPCLocation()
-    return lib.callback.await('ferp_weed:server:getNPCLocation', false)
+    return lib.callback.await('Ferp-Weed:server:getNPCLocation', false)
 end
 
 -- Create NPC
@@ -227,7 +227,7 @@ function RenameStrain(strainId)
         return ManageStrains()
     end
     
-    TriggerServerEvent('ferp_weed:server:renameStrain', strainId, name)
+    TriggerServerEvent('Ferp-Weed:server:renameStrain', strainId, name)
     
     Wait(500)
     ManageStrains()
@@ -243,7 +243,7 @@ function DeleteStrain(strainId)
     })
     
     if alert == 'confirm' then
-        TriggerServerEvent('ferp_weed:server:deleteStrain', strainId)
+        TriggerServerEvent('Ferp-Weed:server:deleteStrain', strainId)
         
         Wait(500)
         ManageStrains()
@@ -254,11 +254,11 @@ end
 
 -- Open weed shop
 function OpenWeedShop()
-    TriggerServerEvent('ferp_weed:server:openShop')
+    TriggerServerEvent('Ferp-Weed:server:openShop')
 end
 
 -- Open shop via ox_inventory
-RegisterNetEvent('ferp_weed:client:openShop', function()
+RegisterNetEvent('Ferp-Weed:client:openShop', function()
     exports.ox_inventory:openInventory('shop', { type = 'weed_shop' })
 end)
 

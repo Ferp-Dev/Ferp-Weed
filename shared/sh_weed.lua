@@ -8,7 +8,7 @@ function Weed.LoadLocale()
     if file then
         Locales = json.decode(file) or {}
     else
-        print('[FERP_WEED] Locale file not found: ' .. locale .. '.json')
+        print('[Ferp-Weed] Locale file not found: ' .. locale .. '.json')
     end
 end
 
