@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `weed_plants` (
     `coords` TEXT NOT NULL,
     `metadata` LONGTEXT NOT NULL,
     `created_at` INT(11) NOT NULL,
-    `expires_at` INT(11) NOT NULL,
+    `expires_at` INT(11) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     INDEX `idx_citizenid` (`citizenid`),
     INDEX `idx_expires` (`expires_at`)

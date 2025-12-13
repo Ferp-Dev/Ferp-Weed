@@ -138,10 +138,10 @@ function Weed.Items.CreateMetadata(itemType, strain, quality)
     metadata.description = string.format("Strain: %s\nQualidade: %d%%", strainName, quality or 50)
     
     -- Debug print
-    if IsDuplicityVersion then
-        print(string.format("[Ferp-Weed] CreateMetadata: type=%s, strain_id=%d, strain_name=%s", 
-            itemType, strainId, strainName))
-    end
+    -- if IsDuplicityVersion then
+    --     print(string.format("[Ferp-Weed] CreateMetadata: type=%s, strain_id=%d, strain_name=%s", 
+    --         itemType, strainId, strainName))
+    -- end
     
     return metadata
 end

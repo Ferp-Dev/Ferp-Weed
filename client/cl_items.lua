@@ -562,6 +562,11 @@ local function IsNearWaterSource()
         `v_61_sink`,
         `prop_toilet_01`,
         `prop_toilet_02`,
+        -- Beach & Outdoor Props TEST
+        `prop_shower_02`,
+        `prop_shower_03`,
+        `prop_shower_01`,
+        `v_res_fabios_sink`,
     }
     
     local nearestDist = 999.0
