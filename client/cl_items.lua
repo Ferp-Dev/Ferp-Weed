@@ -484,11 +484,6 @@ local function IsNearWater()
         return true, coords
     end
     
-    -- Verificar se está submerso
-    if IsEntitySubmergedInWater(cache.ped) then
-        return true, coords
-    end
-    
     -- Testar probe de água natural (mar, rio, lago)
     local waterFound, waterZ = TestProbeAgainstWater(coords.x, coords.y, coords.z, coords.x, coords.y, testZ)
     
