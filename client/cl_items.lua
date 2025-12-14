@@ -91,15 +91,16 @@ RegisterNetEvent('Ferp-Weed:client:smokeJoint', function(quality, slot)
     CreateThread(function()
         local startTime = GetGameTimer()
         
+        
+        StartScreenEffect("DrugsMichaelAliensFight", screenEffectDuration * 1000, false)
+        
         while GetGameTimer() - startTime < (screenEffectDuration * 1000) do
             ShakeGameplayCam("DRUNK_SHAKE", 0.25)
-
-            TriggerScreenblurFadeIn(100)
-            
             Wait(50)
         end
         
-        TriggerScreenblurFadeOut(100)
+        
+        StopScreenEffect("DrugsMichaelAliensFight")
     end)
     
     -- Aplicar efeitos apenas no final (sucesso)
@@ -110,7 +111,7 @@ RegisterNetEvent('Ferp-Weed:client:smokeJoint', function(quality, slot)
     local newArmor = math.min(100, currentArmor + armorBonus)
     SetPedArmour(cache.ped, newArmor)
     
-    -- Reduce stress apenas no final
+    
     if Config.UseStress then
         local stressReduction = math.ceil(Weed.Items.Config.MaxStressReduction * effectiveness)
         TriggerServerEvent('hud:server:RelieveStress', stressReduction)
