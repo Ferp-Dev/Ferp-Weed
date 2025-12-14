@@ -332,9 +332,10 @@ function CheckPlant(entity)
     })
     
     -- Show main menu
+    local menuTitle = strainName ~= Lang('plant', 'no_strain') and string.format('%s - %s', Lang('menu', 'cannabis_plant'), strainName) or Lang('menu', 'cannabis_plant')
     lib.registerContext({
         id = 'weed_plant_menu',
-        title = Lang('menu', 'cannabis_plant'),
+        title = menuTitle,
         options = options
     })
     
