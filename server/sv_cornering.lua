@@ -241,11 +241,11 @@ RegisterNetEvent('Ferp-Weed:server:sellBaggie', function(pedNetId, zone, moneyMu
         -- Mensagem diferente baseada no multiplicador
         local msg
         if moneyMult > 1.0 then
-            msg = string.format('Vendeu %d saquinho(s) por $%d (+gorjeta!)', quantity, totalEarned)
+            msg = Lang('notify', 'sold_baggies_tip', quantity, totalEarned)
         elseif moneyMult < 1.0 then
-            msg = string.format('Vendeu %d saquinho(s) por $%d (preço reduzido)', quantity, totalEarned)
+            msg = Lang('notify', 'sold_baggies_reduced', quantity, totalEarned)
         else
-            msg = string.format('Vendeu %d saquinho(s) por $%d', quantity, totalEarned)
+            msg = Lang('notify', 'sold_baggies_normal', quantity, totalEarned)
         end
         
         Weed.Notify(src, msg, 'success')

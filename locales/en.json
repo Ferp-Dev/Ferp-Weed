@@ -204,7 +204,10 @@
         "baggies_prepared": "Baggies prepared",
         "no_baggies": "You don't have baggies",
         "cannot_destroy_plant": "You cannot destroy this plant",
-        "plant_removed": "Plant removed"
+        "plant_removed": "Plant removed",
+        "sold_baggies_tip": "Sold %d baggie(s) for $%d (+tip!)",
+        "sold_baggies_normal": "Sold %d baggie(s) for $%d",
+        "sold_baggies_reduced": "Sold %d baggie(s) for $%d (reduced price)"
     },
     "items": {
         "female_seed": "Female Seed",

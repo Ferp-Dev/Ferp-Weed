@@ -127,22 +127,22 @@ RegisterNetEvent('Ferp-Weed:server:waterPlant', function(plantId)
     local src = source
     local Player = QBX:GetPlayer(src)
     if not Player then 
-        print('[WEED DEBUG] Player not found for source: ' .. tostring(src))
+        -- print('[WEED DEBUG] Player not found for source: ' .. tostring(src))
         return 
     end
     
-    print('[WEED DEBUG] Water plant called - plantId: ' .. tostring(plantId))
+    -- print('[WEED DEBUG] Water plant called - plantId: ' .. tostring(plantId))
     
     -- Find plant
     local plant = Weed.Plants.Active[plantId]
     
     if not plant then
-        print('[WEED DEBUG] Plant not found in Active - plantId: ' .. tostring(plantId))
-        print('[WEED DEBUG] Active plants: ' .. json.encode(Weed.Plants.Active))
+        -- print('[WEED DEBUG] Plant not found in Active - plantId: ' .. tostring(plantId))
+        -- print('[WEED DEBUG] Active plants: ' .. json.encode(Weed.Plants.Active))
         return Weed.Notify(src, Lang('notify', 'plant_not_found'), 'error')
     end
     
-    print('[WEED DEBUG] Plant found - current water: ' .. tostring(plant.metadata.water))
+    -- print('[WEED DEBUG] Plant found - current water: ' .. tostring(plant.metadata.water))
     
     -- Check if already at max water BEFORE removing item
     if plant.metadata.water >= 1.0 then
@@ -185,11 +185,11 @@ RegisterNetEvent('Ferp-Weed:server:waterPlant', function(plantId)
     
     exports.ox_inventory:SetMetadata(src, wateringCanSlot, newMetadata)
     
-    print('[WEED DEBUG] Watering can water used: ' .. waterUsed .. '%, remaining: ' .. newWater .. '%')
+    -- print('[WEED DEBUG] Watering can water used: ' .. waterUsed .. '%, remaining: ' .. newWater .. '%')
     
     -- Add water to plant
     plant.metadata.water = math.min(1.0, plant.metadata.water + Weed.Plants.Config.WaterAdd)
-    print('[WEED DEBUG] New water level: ' .. tostring(plant.metadata.water))
+    -- print('[WEED DEBUG] New water level: ' .. tostring(plant.metadata.water))
     
     -- Update database
     MySQL.update([[
@@ -416,15 +416,15 @@ RegisterNetEvent('Ferp-Weed:server:harvestPlant', function(plantId)
         
         local seedCount = math.random(Weed.Plants.Config.SeedsFromMale[1], Weed.Plants.Config.SeedsFromMale[2])
         
-        print(string.format("[Ferp-Weed] Harvesting male - strain ID: %d, name: %s", strain.id or 0, strain.name or "NONE"))
+        -- print(string.format("[Ferp-Weed] Harvesting male - strain ID: %d, name: %s", strain.id or 0, strain.name or "NONE"))
         
         for i = 1, seedCount do
             if math.random() <= Weed.Plants.Config.MaleChance then
                 Weed.AddItem(src, 'weed_seed_male', 1)
             else
                 local metadata = Weed.Items.CreateMetadata('weed_seed_female', strain, quality)
-                print(string.format("[Ferp-Weed] Created seed metadata: strain=%d, strain_name=%s, n=%.2f", 
-                    metadata.strain or 0, metadata.strain_name or "NONE", metadata.n or 0))
+                -- print(string.format("[Ferp-Weed] Created seed metadata: strain=%d, strain_name=%s, n=%.2f", 
+                --     metadata.strain or 0, metadata.strain_name or "NONE", metadata.n or 0))
                 Weed.AddItem(src, 'weed_seed_female', 1, metadata)
             end
         end

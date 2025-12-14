@@ -170,7 +170,7 @@ function CheckPlant(entity)
     local citizenid = Player.citizenid
     
     -- Debug strain info
-    print(string.format("[Ferp-Weed] CheckPlant - strain ID: %s", tostring(plant.metadata.strain)))
+    -- print(string.format("[Ferp-Weed] CheckPlant - strain ID: %s", tostring(plant.metadata.strain)))
     
     -- Get strain name - check if plant has a valid strain ID
     local strainId = plant.metadata.strain
@@ -184,19 +184,19 @@ function CheckPlant(entity)
         if strain and strain.name then
             strainName = strain.name
             hasCustomStrain = true
-            print(string.format("[Ferp-Weed] Found custom strain: %s", strainName))
+            -- print(string.format("[Ferp-Weed] Found custom strain: %s", strainName))
         else
             -- Strain exists but not loaded on client - use saved name or generate
             strainName = plant.metadata.strain_name or Weed.Strains.GenerateName(plant.metadata.n or 0.5, plant.metadata.p or 0.5, plant.metadata.k or 0.5)
             hasCustomStrain = true
-            print(string.format("[Ferp-Weed] Strain %d not in cache, using: %s", strainId, strainName))
+            -- print(string.format("[Ferp-Weed] Strain %d not in cache, using: %s", strainId, strainName))
         end
     elseif strainId and strainId < 0 then
         -- Default strain
         strain = Weed.Strains.GetDefaultById(strainId)
         if strain then
             strainName = strain.name
-            print(string.format("[Ferp-Weed] Found default strain: %s (can be replaced)", strainName))
+            -- print(string.format("[Ferp-Weed] Found default strain: %s (can be replaced)", strainName))
         else
             strainName = plant.metadata.strain_name or Lang('plant', 'unknown_strain')
         end
@@ -204,7 +204,7 @@ function CheckPlant(entity)
     else
         -- No strain yet
         strainName = Lang('plant', 'no_strain')
-        print(string.format("[Ferp-Weed] No strain assigned"))
+        -- print(string.format("[Ferp-Weed] No strain assigned"))
     end
     
     -- Build context menu options
@@ -628,9 +628,9 @@ exports('DestroyPlant', DestroyPlant)
 -- ox_inventory export format varies, need to handle multiple cases
 function PlantSeed(data, slot)
     -- Debug
-    print("[Ferp-Weed] ========== PlantSeed ==========")
-    print("[Ferp-Weed] data type: " .. type(data))
-    print("[Ferp-Weed] slot: " .. tostring(slot))
+    -- print("[Ferp-Weed] ========== PlantSeed ==========")
+    -- print("[Ferp-Weed] data type: " .. type(data))
+    -- print("[Ferp-Weed] slot: " .. tostring(slot))
     
     -- Try to find the item data - ox_inventory may pass it differently
     local itemData = nil
@@ -639,12 +639,12 @@ function PlantSeed(data, slot)
     -- Case 1: data is the full item object with metadata
     if type(data) == "table" and data.metadata then
         itemData = data
-        print("[Ferp-Weed] Case 1: data has metadata directly")
+        -- print("[Ferp-Weed] Case 1: data has metadata directly")
     
     -- Case 2: data has slot info, need to search inventory
     elseif type(data) == "table" and data.slot then
         itemSlot = data.slot
-        print("[Ferp-Weed] Case 2: data has slot=" .. tostring(itemSlot))
+        -- print("[Ferp-Weed] Case 2: data has slot=" .. tostring(itemSlot))
     end
     
     -- If we still don't have itemData, search inventory for weed_seed_female
@@ -664,22 +664,22 @@ function PlantSeed(data, slot)
             if not itemData then
                 itemData = items[1]
             end
-            print(string.format("[Ferp-Weed] Found seed via Search - slot: %s, strain: %s", 
-                tostring(itemData and itemData.slot), 
-                tostring(itemData and itemData.metadata and itemData.metadata.strain)))
+            -- print(string.format("[Ferp-Weed] Found seed via Search - slot: %s, strain: %s", 
+            --     tostring(itemData and itemData.slot), 
+            --     tostring(itemData and itemData.metadata and itemData.metadata.strain)))
         end
     end
     
     -- Final debug
     if itemData and itemData.metadata then
-        print(string.format("[Ferp-Weed] Seed metadata - strain: %s, strain_name: %s, n: %s", 
-            tostring(itemData.metadata.strain),
-            tostring(itemData.metadata.strain_name),
-            tostring(itemData.metadata.n)))
+        -- print(string.format("[Ferp-Weed] Seed metadata - strain: %s, strain_name: %s, n: %s", 
+        --     tostring(itemData.metadata.strain),
+        --     tostring(itemData.metadata.strain_name),
+        --     tostring(itemData.metadata.n)))
     else
-        print("[Ferp-Weed] WARNING: No metadata found for seed!")
+        -- print("[Ferp-Weed] WARNING: No metadata found for seed!")
     end
-    print("[Ferp-Weed] ================================")
+    -- print("[Ferp-Weed] ================================")
     
     -- Check if player is outside
     if IsPlayerInBuilding() then
@@ -828,7 +828,7 @@ function PlantSeed(data, slot)
         if itemData.metadata.strain and itemData.metadata.strain ~= 0 then
             modifiers.strain = itemData.metadata.strain
             modifiers.strain_name = itemData.metadata.strain_name
-            print(string.format("[Ferp-Weed] Using strain ID %d from seed", modifiers.strain))
+            -- print(string.format("[Ferp-Weed] Using strain ID %d from seed", modifiers.strain))
             
             -- If positive
             if itemData.metadata.strain > 0 then
@@ -851,8 +851,8 @@ function PlantSeed(data, slot)
         end
     end
     
-    print(string.format("[Ferp-Weed] Planting with modifiers - strain: %s, n: %.2f, p: %.2f, k: %.2f", 
-        tostring(modifiers.strain), modifiers.n or 0, modifiers.p or 0, modifiers.k or 0))
+    -- print(string.format("[Ferp-Weed] Planting with modifiers - strain: %s, n: %.2f, p: %.2f, k: %.2f", 
+    --     tostring(modifiers.strain), modifiers.n or 0, modifiers.p or 0, modifiers.k or 0))
     
     -- Face the plant location
     TaskTurnPedToFaceCoord(cache.ped, finalCoords.x, finalCoords.y, finalCoords.z, 1000)
@@ -1160,7 +1160,7 @@ CreateThread(function()
     -- Give server time to load plants from DB
     Wait(3000)
     
-    print('[WEED CLIENT] Requesting plants from server...')
+    -- print('[WEED CLIENT] Requesting plants from server...')
     
     -- Request plants from server
     local plants = lib.callback.await('Ferp-Weed:server:getPlants', false)
@@ -1178,7 +1178,7 @@ CreateThread(function()
             AddToChunk(plantId, coords)
             count = count + 1
         end
-        print('[WEED CLIENT] Loaded ' .. count .. ' plants into ' .. TableCount(PlantChunks) .. ' chunks')
+        -- print('[WEED CLIENT] Loaded ' .. count .. ' plants into ' .. TableCount(PlantChunks) .. ' chunks')
         
         -- Force spawn nearby plants immediately
         if count > 0 then
@@ -1208,10 +1208,10 @@ CreateThread(function()
                 end
                 if spawned >= maxVisible then break end
             end
-            print('[WEED CLIENT] Spawned ' .. spawned .. ' nearby plants')
+            -- print('[WEED CLIENT] Spawned ' .. spawned .. ' nearby plants')
         end
     else
-        print('[WEED CLIENT] No plants received from server')
+        -- print('[WEED CLIENT] No plants received from server')
     end
 end)
 
@@ -1313,7 +1313,7 @@ function IsValidPlantingSurface(coords)
     local material, groundZ = GetGroundMaterial(coords)
     
     -- Debug: print material hash to console
-    print(string.format("[WEED DEBUG] Ground material at coords: %d", material))
+    -- print(string.format("[WEED DEBUG] Ground material at coords: %d", material))
     
     -- Check if material is blocked
     local blockedType = BlockedPlantingMaterials[material]

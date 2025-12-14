@@ -275,12 +275,12 @@ end
 -- Customer acquisition loop
 function StartCustomerLoop()
     if customerThreadActive then 
-        print('[CORNERING] Loop já ativo, retornando')
+        -- print('[CORNERING] Loop já ativo, retornando')
         return 
     end
     customerThreadActive = true
     
-    print('[CORNERING] Iniciando loop de clientes')
+    -- print('[CORNERING] Iniciando loop de clientes')
     
     -- Thread de verificação de distância (mais rápida)
     CreateThread(function()
@@ -333,10 +333,10 @@ function StartCustomerLoop()
         local dealerRep = lib.callback.await('Ferp-Weed:server:getDealerReputation', false)
         local timer = dealerRep and dealerRep.timer or Weed.Cornering.Config.TimeBetweenAcquisition
         
-        print('[CORNERING] Timer entre clientes: ' .. timer .. ' segundos')
+        -- print('[CORNERING] Timer entre clientes: ' .. timer .. ' segundos')
         
         while corneringActive do
-            print('[CORNERING] Aguardando ' .. timer .. 's para próximo cliente...')
+            -- print('[CORNERING] Aguardando ' .. timer .. 's para próximo cliente...')
             Wait(timer * 1000)
             
             if not corneringActive then break end
@@ -345,7 +345,7 @@ function StartCustomerLoop()
             local foundPed = nil
             local peds = GetGamePool('CPed')
             
-            print('[CORNERING] Procurando ped... Total de peds: ' .. #peds)
+            -- print('[CORNERING] Procurando ped... Total de peds: ' .. #peds)
             
             for _, ped in ipairs(peds) do
                 if DoesEntityExist(ped) and
@@ -360,14 +360,14 @@ function StartCustomerLoop()
                    #(corneringCoords - GetEntityCoords(ped)) < 100.0 then
                     foundPed = ped
                     notFoundCount = 0
-                    print('[CORNERING] Ped encontrado!')
+                    -- print('[CORNERING] Ped encontrado!')
                     break
                 end
             end
             
             if not foundPed then
                 notFoundCount = notFoundCount + 1
-                print('[CORNERING] Nenhum ped encontrado. Tentativas falhas: ' .. notFoundCount)
+                -- print('[CORNERING] Nenhum ped encontrado. Tentativas falhas: ' .. notFoundCount)
                 
                 if notFoundCount > 7 then
                     Weed.Notify(nil, Lang('notify', 'location_dried'), 'error')
@@ -382,21 +382,21 @@ function StartCustomerLoop()
                 local retval, point = GetPointOnRoadSide(corneringCoords.x, corneringCoords.y, corneringCoords.z, 1)
                 if retval and point then
                     roadCoords = point
-                    print('[CORNERING] GetPointOnRoadSide sucesso!')
+                    -- print('[CORNERING] GetPointOnRoadSide sucesso!')
                 else
-                    print('[CORNERING] GetPointOnRoadSide falhou, tentando alternativas...')
+                    -- print('[CORNERING] GetPointOnRoadSide falhou, tentando alternativas...')
                     
                     -- Método 2: GetClosestVehicleNode
                     local found, nodeCoords = GetClosestVehicleNode(corneringCoords.x, corneringCoords.y, corneringCoords.z, 1, 3.0, 0)
                     if found then
                         roadCoords = nodeCoords
-                        print('[CORNERING] GetClosestVehicleNode sucesso!')
+                        -- print('[CORNERING] GetClosestVehicleNode sucesso!')
                     else
                         -- Método 3: GetNthClosestVehicleNode
                         local found2, nodeCoords2 = GetNthClosestVehicleNode(corneringCoords.x, corneringCoords.y, corneringCoords.z, 2, 1, 3.0, 0)
                         if found2 then
                             roadCoords = nodeCoords2
-                            print('[CORNERING] GetNthClosestVehicleNode sucesso!')
+                            -- print('[CORNERING] GetNthClosestVehicleNode sucesso!')
                         else
                             -- Método 4: Posição próxima do veículo (fallback)
                             if corneringVehicle and DoesEntityExist(corneringVehicle) then
@@ -406,12 +406,12 @@ function StartCustomerLoop()
                                 local offsetX = vehCoords.x - math.sin(math.rad(vehHeading)) * 3.0
                                 local offsetY = vehCoords.y + math.cos(math.rad(vehHeading)) * 3.0
                                 roadCoords = vector3(offsetX, offsetY, vehCoords.z)
-                                print('[CORNERING] Usando posição atrás do veículo como fallback')
+                                -- print('[CORNERING] Usando posição atrás do veículo como fallback')
                             else
                                 -- Método 5: Posição próxima do player (último fallback)
                                 local playerCoords = GetEntityCoords(cache.ped)
                                 roadCoords = vector3(playerCoords.x + math.random(-3, 3), playerCoords.y + math.random(-3, 3), playerCoords.z)
-                                print('[CORNERING] Usando posição próxima do player como fallback')
+                                -- print('[CORNERING] Usando posição próxima do player como fallback')
                             end
                         end
                     end
@@ -419,10 +419,10 @@ function StartCustomerLoop()
                 
                 if roadCoords then
                     corneringPeds[foundPed] = true
-                    print('[CORNERING] Enviando cliente para servidor')
+                    -- print('[CORNERING] Enviando cliente para servidor')
                     TriggerServerEvent('Ferp-Weed:server:sendCustomer', roadCoords, NetworkGetNetworkIdFromEntity(foundPed))
                 else
-                    print('[CORNERING] ERRO: Não conseguiu encontrar nenhuma posição válida')
+                    -- print('[CORNERING] ERRO: Não conseguiu encontrar nenhuma posição válida')
                 end
             end
         end
@@ -436,14 +436,14 @@ RegisterNetEvent('Ferp-Weed:client:customerApproach', function(pedNetId, coords)
     local ped = NetworkGetEntityFromNetworkId(pedNetId)
     
     if not DoesEntityExist(ped) then 
-        print('[CORNERING] Ped do evento customerApproach não existe')
+        -- print('[CORNERING] Ped do evento customerApproach não existe')
         return 
     end
     
     -- Garantir que o ped está na lista (pode ter handle diferente após passar pelo servidor)
     if not corneringPeds[ped] then
         corneringPeds[ped] = true
-        print('[CORNERING] Ped adicionado à lista via customerApproach (handle: ' .. tostring(ped) .. ')')
+        -- print('[CORNERING] Ped adicionado à lista via customerApproach (handle: ' .. tostring(ped) .. ')')
     end
     
     ClearPedTasks(ped)
@@ -485,7 +485,7 @@ RegisterNetEvent('Ferp-Weed:client:customerApproach', function(pedNetId, coords)
         end
         
         if not arrived then
-            print('[CORNERING] Cliente não conseguiu chegar, removendo...')
+            -- print('[CORNERING] Cliente não conseguiu chegar, removendo...')
             corneringPeds[ped] = nil
             SetEntityAsNoLongerNeeded(ped)
             return
@@ -499,7 +499,7 @@ RegisterNetEvent('Ferp-Weed:client:customerApproach', function(pedNetId, coords)
         SetPedKeepTask(ped, true)
         SetEntityAsMissionEntity(ped, true, true)
         
-        print('[CORNERING] Cliente chegou e está esperando (handle: ' .. tostring(ped) .. ')')
+        -- print('[CORNERING] Cliente chegou e está esperando (handle: ' .. tostring(ped) .. ')')
         
         SetTimeout(120000, function()
             if DoesEntityExist(ped) then

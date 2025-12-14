@@ -8,7 +8,7 @@ function Weed.LoadLocale()
     if file then
         Locales = json.decode(file) or {}
     else
-        print('[Ferp-Weed] Locale file not found: ' .. locale .. '.json')
+        -- print('[Ferp-Weed] Locale file not found: ' .. locale .. '.json')
     end
 end
 
@@ -40,7 +40,7 @@ function Weed.Debug(message, ...)
         params[#params + 1] = tostring(param)
     end
     
-    print(string.format("[QBX-WEED DEBUG] " .. message, table.unpack(params)))
+    -- print(string.format("[QBX-WEED DEBUG] " .. message, table.unpack(params)))
 end
 
 function Weed.Notify(src, message, type, duration)

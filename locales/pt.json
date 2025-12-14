@@ -204,7 +204,10 @@
         "baggies_prepared": "Saquinhos preparados",
         "no_baggies": "Você não tem saquinhos",
         "cannot_destroy_plant": "Você não pode destruir esta planta",
-        "plant_removed": "Planta removida"
+        "plant_removed": "Planta removida",
+        "sold_baggies_tip": "Vendeu %d saquinho(s) por $%d (+gorjeta!)",
+        "sold_baggies_normal": "Vendeu %d saquinho(s) por $%d",
+        "sold_baggies_reduced": "Vendeu %d saquinho(s) por $%d (preço reduzido)"
     },
     "items": {
         "female_seed": "Semente Feminina",

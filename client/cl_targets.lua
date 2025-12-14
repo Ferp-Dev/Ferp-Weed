@@ -64,7 +64,7 @@ function SetupVehicleTargets()
                 return true
             end,
             onSelect = function(data)
-                print('[CORNERING DEBUG] ox_target clicado, disparando evento')
+                -- print('[CORNERING DEBUG] ox_target clicado, disparando evento')
                 TriggerEvent('Ferp-Weed:client:startCornering', data.entity)
             end
         },
@@ -77,7 +77,7 @@ function SetupVehicleTargets()
                 return corneringActive
             end,
             onSelect = function(data)
-                exports.Ferp-Weed:StopCornering()
+                exports['Ferp-Weed']:StopCornering()
             end
         }
     })
@@ -103,7 +103,7 @@ function SetupPedTargets()
                 return true
             end,
             onSelect = function(data)
-                exports.Ferp-Weed:SellToCustomer(data.entity)
+                exports['Ferp-Weed']:SellToCustomer(data.entity)
             end
         }
     })
@@ -135,7 +135,7 @@ function SetupNPCTargets()
                     icon = 'fa-solid fa-shop',
                     distance = 2.0,
                     onSelect = function()
-                        exports.Ferp-Weed:OpenWeedShop()
+                        exports['Ferp-Weed']:OpenWeedShop()
                     end
                 },
                 {
@@ -144,7 +144,7 @@ function SetupNPCTargets()
                     icon = 'fa-solid fa-ranking-star',
                     distance = 2.0,
                     onSelect = function()
-                        exports.Ferp-Weed:ShowStrainRanking()
+                        exports['Ferp-Weed']:ShowStrainRanking()
                     end
                 },
                 {
@@ -153,7 +153,7 @@ function SetupNPCTargets()
                     icon = 'fa-solid fa-leaf',
                     distance = 2.0,
                     onSelect = function()
-                        exports.Ferp-Weed:ManageStrains()
+                        exports['Ferp-Weed']:ManageStrains()
                     end
                 }
             }
