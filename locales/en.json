@@ -207,7 +207,8 @@
         "plant_removed": "Plant removed",
         "sold_baggies_tip": "Sold %d baggie(s) for $%d (+tip!)",
         "sold_baggies_normal": "Sold %d baggie(s) for $%d",
-        "sold_baggies_reduced": "Sold %d baggie(s) for $%d (reduced price)"
+        "sold_baggies_reduced": "Sold %d baggie(s) for $%d (reduced price)",
+        "plant_too_big_strain": "Plant is too big to create custom strain"
     },
     "items": {
         "female_seed": "Female Seed",

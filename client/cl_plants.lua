@@ -261,9 +261,11 @@ function CheckPlant(entity)
     local strainOptions = {}
     
     -- Option to create new strain
+    local stage = Weed.Plants.GetStage(growth)
     strainOptions[#strainOptions + 1] = {
         title = Lang('menu', 'create_new_strain'),
         icon = "fa-solid fa-plus",
+        disabled = stage >= 3,
         onSelect = function()
             CreateStrainNew(entity, plant)
         end
@@ -282,7 +284,7 @@ function CheckPlant(entity)
         end
     end
 
-    if not hasCustomStrain and hasStrainModifier then
+    if not hasCustomStrain and hasStrainModifier and stage < 3 then
         options[#options + 1] = {
             title = Lang('menu', 'create_custom_strain'),
             description = strainId and strainId < 0 and Lang('plant', 'replace_strain', strainName) or Lang('plant', 'strain_modifier_required'),
@@ -460,6 +462,15 @@ exports('WaterPlant', WaterPlant)
 -- Create new strain on plant
 function CreateStrainNew(entity, plant)
     if not DoesEntityExist(entity) then return end
+    
+    -- Check if plant is small enough
+    local currentTime = GetCurrentTime()
+    local growth = Weed.Plants.GetGrowth(plant, currentTime)
+    local stage = Weed.Plants.GetStage(growth)
+    
+    if stage >= 3 then
+        return Weed.Notify(cache.serverId, Lang('notify', 'plant_too_big_strain'), 'error')
+    end
     
     -- Verificar se tem o kit de modificação genética
     local strainModifier = exports.ox_inventory:Search('count', 'strain_modifier')

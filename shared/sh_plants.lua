@@ -2,11 +2,11 @@ Weed.Plants = {}
 
 Weed.Plants.Config = {
     -- Growth Settings
-    GrowthTime = 1, -- Minutes for full growth
+    GrowthTime = 400, -- Minutes for full growth
     LifeTime = 1400, -- Total lifetime in minutes
     MaleFactor = 1.5, -- Male plants grow slower
     HarvestPercent = 100.0, -- Growth % needed to harvest
-    TimeBetweenHarvest = 1, -- Minutes between harvests
+    TimeBetweenHarvest = 120, -- Minutes between harvests
     FertilizerFactor = 1.1, -- Growth speed boost with fertilizer
     
     -- Harvest Settings

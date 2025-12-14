@@ -207,7 +207,8 @@
         "plant_removed": "Planta removida",
         "sold_baggies_tip": "Vendeu %d saquinho(s) por $%d (+gorjeta!)",
         "sold_baggies_normal": "Vendeu %d saquinho(s) por $%d",
-        "sold_baggies_reduced": "Vendeu %d saquinho(s) por $%d (preço reduzido)"
+        "sold_baggies_reduced": "Vendeu %d saquinho(s) por $%d (preço reduzido)",
+        "plant_too_big_strain": "A planta está muito grande para criar strain customizada"
     },
     "items": {
         "female_seed": "Semente Feminina",
