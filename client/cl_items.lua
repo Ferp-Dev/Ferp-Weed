@@ -86,6 +86,22 @@ RegisterNetEvent('Ferp-Weed:client:smokeJoint', function(quality, slot)
     TriggerEvent('evidence:client:SetStatus', 'redeyes', Weed.Items.Config.RedEyesDuration)
     TriggerEvent('evidence:client:SetStatus', 'weedsmell', Weed.Items.Config.WeedSmellDuration)
     
+    local screenEffectDuration = 15 - (effectiveness * 10) -- Range: 5-15 segundos
+    
+    CreateThread(function()
+        local startTime = GetGameTimer()
+        
+        while GetGameTimer() - startTime < (screenEffectDuration * 1000) do
+            ShakeGameplayCam("DRUNK_SHAKE", 0.25)
+
+            TriggerScreenblurFadeIn(100)
+            
+            Wait(50)
+        end
+        
+        TriggerScreenblurFadeOut(100)
+    end)
+    
     -- Aplicar efeitos apenas no final (sucesso)
     
     -- Add armor baseado na qualidade (max 50 com quality 100%)

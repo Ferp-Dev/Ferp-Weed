@@ -8,7 +8,7 @@ Weed.Items.Config = {
     JointLossRate = 1.0, -- Quality loss rate
     
     -- Joint Effects
-    JointDuration = 60, -- Seconds
+    JointDuration = 15, -- Seconds
     ArmorPerTick = 3, -- Armor gained per second
     StressReduction = 100, -- Stress reduced per tick
     MaxStressReduction = 5000, -- Maximum total stress reduction
