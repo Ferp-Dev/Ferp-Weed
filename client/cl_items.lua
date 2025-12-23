@@ -105,15 +105,160 @@ RegisterNetEvent('Ferp-Weed:client:smokeJoint', function(quality, slot)
     
     -- Aplicar efeitos apenas no final (sucesso)
     
+    -- Aplicar efeitos apenas no final (sucesso)
+    
+    -- Get strain data if available
+    local strainId = nil
+    -- Need to find specific item slot to get metadata? 'slot' is passed to event.
+    -- Assuming item usage logic passed slot or we can retrieve it.
+    -- BUT, slot is passed to smokeJoint.
+    local item = exports.ox_inventory:GetSlot(slot)
+    local strain = nil
+    if item and item.metadata and item.metadata.strain then
+        strain = Weed.Strains.Get(item.metadata.strain)
+    end
+    
     -- Add armor baseado na qualidade (max 50 com quality 100%)
     local armorBonus = math.ceil(50 * effectiveness)
+    
+    -- Perk: Stone Skin
+    if strain then
+        local stoneSkinBonus = Weed.Perks.GetModifier(strain.perks, 'stone_skin')
+        if stoneSkinBonus > 0 then
+            armorBonus = armorBonus + stoneSkinBonus
+            Weed.Notify(nil, Lang('notify', 'buff_stone_skin'), 'success')
+        end
+    end
+    
     local currentArmor = GetPedArmour(cache.ped)
     local newArmor = math.min(100, currentArmor + armorBonus)
     SetPedArmour(cache.ped, newArmor)
     
+    -- Perk: Vitality (Health Regen)
+    if strain then
+        local vitalityTier = Weed.Perks.GetModifier(strain.perks, 'vitality')
+        if vitalityTier > 0 then
+            CreateThread(function()
+                local duration = 60000 -- 1 minute regen
+                local endRegen = GetGameTimer() + duration
+                Weed.Notify(nil, Lang('notify', 'buff_vitality'), 'success')
+                
+                while GetGameTimer() < endRegen do
+                    local hp = GetEntityHealth(cache.ped)
+                    if hp < 200 and hp > 0 then
+                        SetEntityHealth(cache.ped, hp + 1)
+                    end
+                    Wait(2000 / vitalityTier) -- Higher tier = faster regen
+                end
+            end)
+        end
+    end
+    
+    -- Perk: Swiftness (Speed)
+    if strain then
+        local speedMult = Weed.Perks.GetModifier(strain.perks, 'swiftness')
+        if speedMult > 1.0 then
+             CreateThread(function()
+                local duration = 60000 
+                local endSpeed = GetGameTimer() + duration
+                Weed.Notify(nil, Lang('notify', 'buff_swiftness'), 'success')
+                
+                SetRunSprintMultiplierForPlayer(PlayerId(), speedMult)
+                while GetGameTimer() < endSpeed do
+                    Wait(1000)
+                end
+                SetRunSprintMultiplierForPlayer(PlayerId(), 1.0)
+            end)
+        end
+    end
+    
+    -- Perk: Endurance (Infinite Stamina)
+    if strain then
+        local duration = Weed.Perks.GetModifier(strain.perks, 'endurance')
+        if duration > 0 then
+            CreateThread(function()
+                local endTime = GetGameTimer() + (duration * 1000)
+                Weed.Notify(nil, Lang('notify', 'buff_endurance'), 'success')
+                
+                while GetGameTimer() < endTime do
+                    RestorePlayerStamina(PlayerId(), 1.0)
+                    Wait(1000)
+                end
+            end)
+        end
+    end
+    
+    -- Perk: Iron Lungs (Breath)
+    if strain then
+        local breathMult = Weed.Perks.GetModifier(strain.perks, 'iron_lungs')
+        if breathMult > 1.0 then
+             -- Default is usually 10.0 or similar logic. We multiply it.
+             local defaultTime = GetPedMaxTimeUnderwater(cache.ped)
+             SetPedMaxTimeUnderwater(cache.ped, defaultTime * breathMult)
+             Weed.Notify(nil, Lang('notify', 'buff_iron_lungs'), 'success')
+             
+             -- Reset after ONE minute? Or permanent until relog? 
+             -- Let's make it temporary (e.g., 2 minutes) to fit "buff" style
+             SetTimeout(120000, function()
+                 SetPedMaxTimeUnderwater(cache.ped, defaultTime)
+                 Weed.Notify(nil, Lang('notify', 'buff_faded'), 'info')
+             end)
+        end
+    end
+
+    -- Perk: Shadow (Stealth)
+    if strain then
+        local noiseMult = Weed.Perks.GetModifier(strain.perks, 'shadow')
+        if noiseMult < 1.0 and noiseMult >= 0 then
+             SetPlayerNoiseMultiplier(PlayerId(), noiseMult)
+             Weed.Notify(nil, Lang('notify', 'buff_shadow'), 'success')
+             
+             SetTimeout(120000, function()
+                SetPlayerNoiseMultiplier(PlayerId(), 1.0)
+                Weed.Notify(nil, Lang('notify', 'buff_faded'), 'info')
+             end)
+        end
+    end
+    
+    -- Perk: Night Vision
+    if strain then
+        local duration = Weed.Perks.GetModifier(strain.perks, 'night_vision')
+        if duration > 0 then
+             SetNightvision(true)
+             Weed.Notify(nil, Lang('notify', 'buff_night_vision'), 'success')
+             
+             SetTimeout(duration * 1000, function()
+                 SetNightvision(false)
+             end)
+        end
+    end
+
+    -- Perk: Strength
+    if strain then
+        local dmgMult = Weed.Perks.GetModifier(strain.perks, 'strength')
+        if dmgMult > 1.0 then
+            SetPlayerMeleeWeaponDamageModifier(PlayerId(), dmgMult)
+            Weed.Notify(nil, Lang('notify', 'buff_strength'), 'success')
+            
+            SetTimeout(120000, function()
+                SetPlayerMeleeWeaponDamageModifier(PlayerId(), 1.0)
+                Weed.Notify(nil, Lang('notify', 'buff_faded'), 'info')
+            end)
+        end
+    end
+    
     
     if Config.UseStress then
         local stressReduction = math.ceil(Weed.Items.Config.MaxStressReduction * effectiveness)
+        
+        -- Perk: Stress Relief
+        if strain then
+            local stressMod = Weed.Perks.GetModifier(strain.perks, 'stress_relief')
+            if stressMod > 1.0 then
+                stressReduction = math.ceil(stressReduction * stressMod)
+            end
+        end
+        
         TriggerServerEvent('hud:server:RelieveStress', stressReduction)
     end
     

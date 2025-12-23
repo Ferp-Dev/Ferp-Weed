@@ -115,6 +115,12 @@ function Weed.Cornering.CalculatePrice(quality, strainReputation)
     -- Strain reputation multiplier
     if strainReputation then
         local repMultiplier = strainReputation / Weed.Cornering.Config.DividerReputationBonus
+        
+        -- Cap logic
+        if Weed.Cornering.Config.MaxReputationBonus and repMultiplier > Weed.Cornering.Config.MaxReputationBonus then
+             repMultiplier = Weed.Cornering.Config.MaxReputationBonus
+        end
+        
         local repBonus = math.floor(basePrice * repMultiplier)
         basePrice = basePrice + repBonus
     end

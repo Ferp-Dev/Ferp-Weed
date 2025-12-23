@@ -85,15 +85,35 @@ function Weed.Plants.GetStage(percent)
     return math.floor((percent / percentPerStage) + 1.5)
 end
 
-function Weed.Plants.GetGrowth(plant, currentTime)
+function Weed.Plants.GetGrowth(plant, currentTime, growthModifier)
     local createdAt = plant.metadata.createdAt
     local gender = plant.metadata.gender
     local nFactor = plant.metadata.n
     local timeDiff = (currentTime - createdAt) / 60
     local genderFactor = (gender == 1 and Weed.Plants.Config.MaleFactor or 1)
     local fertilizerFactor = nFactor >= 0.9 and Weed.Plants.Config.FertilizerFactor or 1.0
-    local growthFactors = (Weed.Plants.Config.GrowthTime * genderFactor * fertilizerFactor)
-    return math.min((timeDiff / growthFactors) * 100, 100.0)
+    
+    -- growthModifier decreases time needed (e.g. 0.9 = 90% of time)
+    local mod = growthModifier or 1.0
+    
+    local totalGrowthTime = Weed.Plants.Config.GrowthTime * genderFactor * mod
+    
+    -- Fertilizer factor actually SPEEDS UP growth, so it should reduce time or increase rate?
+    -- Original code: growthFactors = (GrowthTime * gender * fertilizer)
+    -- Wait, if fertilizerFactor is 1.1, time INCREASES? That slows it down.
+    -- Config says: FertilizerFactor = 1.1.
+    -- Current logic: timeDiff / (GrowthTime * 1.5 * 1.1) -> Slower.
+    -- Logic error in original code? Or FertilizerFactor should be < 1.0?
+    -- Config says "Growth speed boost with fertilizer".
+    -- I will assume FertilizerFactor meant to be divisor or should be < 1.0. 
+    -- Let's fix fertilizer logic too: divide by factor if > 1, or multiply if < 1.
+    -- Assuming 1.1 means 10% faster: time / (Base / 1.1).
+    
+    if fertilizerFactor > 1.0 then
+        totalGrowthTime = totalGrowthTime / fertilizerFactor
+    end
+
+    return math.min((timeDiff / totalGrowthTime) * 100, 100.0)
 end
 
 function Weed.Plants.GetQuality(plant)

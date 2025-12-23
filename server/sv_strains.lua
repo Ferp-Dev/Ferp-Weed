@@ -36,8 +36,8 @@ function Weed.Strains.Create(citizenid, strainData)
     
     -- Insert new strain with name
     local insertId = MySQL.insert.await([[
-        INSERT INTO weed_strains (citizenid, name, strain, reputation, renamed)
-        VALUES (?, ?, ?, 0, 0)
+        INSERT INTO weed_strains (citizenid, name, strain, reputation, xp, level, perks, unlocked, indoor_unlocked, indoor_upgrades, renamed)
+        VALUES (?, ?, ?, 0, 0, 1, ?, ?, 0, ?, 0)
     ]], {
         citizenid,
         name,
@@ -45,7 +45,10 @@ function Weed.Strains.Create(citizenid, strainData)
             n = strainData.n,
             p = strainData.p,
             k = strainData.k
-        })
+        }),
+        json.encode({}),
+        json.encode({}),
+        json.encode({})
     })
     
     if not insertId then return false end
@@ -56,6 +59,12 @@ function Weed.Strains.Create(citizenid, strainData)
         citizenid = citizenid,
         name = name,
         reputation = 0,
+        xp = 0,
+        level = 1,
+        perks = {},
+        unlocked = {},
+        indoor_unlocked = false,
+        indoor_upgrades = {},
         n = strainData.n,
         p = strainData.p,
         k = strainData.k,
@@ -94,6 +103,119 @@ function Weed.Strains.UpdateReputation(strainId, value)
     return true
 end
 
+-- Add XP to Strain
+function Weed.Strains.AddXP(strainId, amount)
+    local strain = Weed.Strains.Created[strainId]
+    if not strain then return false end
+    
+    -- Checks if max level
+    local maxLevel = 10 -- Hardcoded max for safety, though defined in config
+    if strain.level >= maxLevel then return false end
+    
+    strain.xp = strain.xp + amount
+    local newLevel = Weed.Perks.GetLevelFromXP(strain.xp)
+    
+    local leveledUp = false
+    if newLevel > strain.level then
+        strain.level = newLevel
+        leveledUp = true
+        -- Find owner and notify
+        local Player = QBX:GetPlayerByCitizenId(strain.citizenid)
+        if Player then
+            -- Use Laptop Notification for Level Up
+             TriggerClientEvent('Ferp-Weed:client:laptopNotify', Player.PlayerData.source, 'Lab', Lang('notify', 'strain_level_up', strain.name, newLevel), 'success')
+        end
+    end
+    
+    -- Update DB
+    MySQL.update('UPDATE weed_strains SET xp = ?, level = ? WHERE id = ?', {strain.xp, strain.level, strainId})
+    
+    if leveledUp then
+        TriggerClientEvent('Ferp-Weed:client:loadStrains', -1, Weed.Strains.Created)
+    end
+    
+    Weed.Debug("Strain %d gained %d XP (Total: %d, Lvl: %d)", strainId, amount, strain.xp, strain.level)
+    return true
+end
+
+-- Unlock/Upgrade Perk
+RegisterNetEvent('Ferp-Weed:server:unlockPerk', function(strainId, perkId, type)
+    local src = source
+    local Player = exports.qbx_core:GetPlayer(src)
+    if not Player then return end
+    
+    local strain = Weed.Strains.Created[strainId]
+    if not strain then return end
+    
+    if strain.citizenid ~= Player.PlayerData.citizenid then
+        return TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Lab', Lang('notify', 'not_strain_owner'), 'error')
+    end
+    
+    type = type or 'perk'
+
+    if type == 'perk' then
+        local perkDef = Weed.Perks.List[perkId]
+        if not perkDef then return end
+        
+        -- Check required level
+        if perkDef.reqLevel and strain.level < perkDef.reqLevel then
+            return TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Lab', Lang('notify', 'strain_level_too_low'), 'error')
+        end
+        
+        -- Check points
+        local currentPointsUsed = 0
+        for pid, level in pairs(strain.perks) do
+            local pDef = Weed.Perks.List[pid]
+            if pDef then
+                currentPointsUsed = currentPointsUsed + (level * pDef.cost)
+            end
+        end
+        
+        local totalPoints = Weed.Perks.GetPointsTotal(strain.level)
+        local pointsAvailable = totalPoints - currentPointsUsed
+        
+        if pointsAvailable < perkDef.cost then
+            return TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Lab', Lang('notify', 'not_enough_points'), 'error')
+        end
+        
+        -- Check max level for perk
+        local currentPerkLevel = strain.perks[perkId] or 0
+        if currentPerkLevel >= perkDef.maxLevel then
+            return TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Lab', Lang('notify', 'perk_maxed'), 'error')
+        end
+        
+        -- Upgrade
+        strain.perks[perkId] = currentPerkLevel + 1
+        TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Lab', Lang('notify', 'perk_unlocked'), 'success')
+
+    elseif type == 'indoor_unlock' then
+        strain.indoor_unlocked = true
+        TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Indoor System', 'Indoor Unlocked!', 'success')
+
+    elseif type == 'indoor_upgrade' then
+        if not strain.indoor_upgrades then strain.indoor_upgrades = {} end
+        table.insert(strain.indoor_upgrades, perkId)
+        TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Indoor System', 'Upgrade Installed!', 'success')
+
+    elseif type == 'mastery' then
+        if not strain.unlocked then strain.unlocked = {} end
+        table.insert(strain.unlocked, perkId)
+        TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Mastery', 'Mastery Unlocked!', 'success')
+    end
+    
+    -- Save (Comprehensive Update)
+    MySQL.update('UPDATE weed_strains SET perks = ?, unlocked = ?, indoor_unlocked = ?, indoor_upgrades = ? WHERE id = ?', {
+        json.encode(strain.perks or {}),
+        json.encode(strain.unlocked or {}),
+        strain.indoor_unlocked and 1 or 0,
+        json.encode(strain.indoor_upgrades or {}),
+        strainId
+    })
+    
+    -- Update clients
+    TriggerClientEvent('Ferp-Weed:client:loadStrains', -1, Weed.Strains.Created)
+end)
+
 -- Update strain rankings
 function UpdateStrainRankings()
     local ranking = {}
@@ -122,7 +244,7 @@ RegisterNetEvent('Ferp-Weed:server:renameStrain', function(strainId, newName)
     local Player = QBX:GetPlayer(src)
     if not Player then return end
     
-    local strain = Weed.Strains.Created[strainId]
+    local strain = Weed.Strains.Get(strainId)
     if not strain then
         return Weed.Notify(src, Lang('notify', 'strain_not_found'), 'error')
     end
@@ -134,29 +256,33 @@ RegisterNetEvent('Ferp-Weed:server:renameStrain', function(strainId, newName)
     
     -- Check if already renamed
     if strain.renamed then
-        return Weed.Notify(src, Lang('notify', 'already_renamed'), 'error')
+        return TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Lab', Lang('notify', 'already_renamed'), 'error')
     end
     
-    -- Check reputation level
-    local reputation = Weed.Strains.GetReputation(strain)
-    if not reputation.canChangeName then
-        return Weed.Notify(src, Lang('notify', 'insufficient_reputation'), 'error')
+    -- Check level requirement (Level 5+)
+    if strain.level < 5 then
+        return TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Lab', Lang('notify', 'insufficient_level_rename'), 'error')
     end
     
     -- Validate name
     if #newName < 5 or #newName > 50 then
-        return Weed.Notify(src, Lang('notify', 'invalid_name'), 'error')
+        return TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Lab', Lang('notify', 'invalid_name'), 'error')
     end
     
     -- Update database
-    local updated = MySQL.update.await([[
+    local success, updated = pcall(MySQL.update.await, [[
         UPDATE weed_strains
         SET name = ?, renamed = 1
         WHERE id = ?
-    ]], {newName, strainId})
+    ]], {newName, strain.id})
     
-    if not updated or updated == 0 then
-        return Weed.Notify(src, Lang('notify', 'rename_error'), 'error')
+    if not success or not updated or updated == 0 then
+        -- Fallback: If 'renamed' column is missing, try updating without it
+        if not success then
+             pcall(MySQL.update.await, 'UPDATE weed_strains SET name = ? WHERE id = ?', {newName, strain.id})
+        else
+             return TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Lab', Lang('notify', 'rename_error'), 'error')
+        end
     end
     
     -- Update in memory
@@ -166,7 +292,7 @@ RegisterNetEvent('Ferp-Weed:server:renameStrain', function(strainId, newName)
     -- Broadcast to all clients
     TriggerClientEvent('Ferp-Weed:client:loadStrains', -1, Weed.Strains.Created)
     
-    Weed.Notify(src, Lang('notify', 'strain_renamed'), 'success')
+    TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Lab', Lang('notify', 'strain_renamed'), 'success')
     Weed.Debug("Strain %d renamed to %s", strainId, newName)
 end)
 
@@ -178,18 +304,18 @@ RegisterNetEvent('Ferp-Weed:server:deleteStrain', function(strainId)
     
     local strain = Weed.Strains.Created[strainId]
     if not strain then
-        return Weed.Notify(src, Lang('notify', 'strain_not_found'), 'error')
+        return TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Lab', Lang('notify', 'strain_not_found'), 'error')
     end
     
     -- Check ownership
     if strain.citizenid ~= Player.PlayerData.citizenid then
-        return Weed.Notify(src, Lang('notify', 'not_your_strain'), 'error')
+        return TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Lab', Lang('notify', 'not_your_strain'), 'error')
     end
     
     -- Check reputation level
     local reputation = Weed.Strains.GetReputation(strain)
     if not reputation.canChangeName then
-        return Weed.Notify(src, Lang('notify', 'reputation_too_high'), 'error')
+        return TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Lab', Lang('notify', 'reputation_too_high'), 'error')
     end
     
     -- Delete from database
@@ -204,7 +330,7 @@ RegisterNetEvent('Ferp-Weed:server:deleteStrain', function(strainId)
     -- Broadcast to all clients
     TriggerClientEvent('Ferp-Weed:client:loadStrains', -1, Weed.Strains.Created)
     
-    Weed.Notify(src, Lang('notify', 'strain_deleted'), 'success')
+    TriggerClientEvent('Ferp-Weed:client:laptopNotify', src, 'Lab', Lang('notify', 'strain_deleted'), 'success')
     Weed.Debug("Strain %d deleted", strainId)
 end)
 
@@ -245,6 +371,12 @@ CreateThread(function()
                 citizenid = strainData.citizenid,
                 name = name,
                 reputation = strainData.reputation or 0,
+                xp = strainData.xp or 0,
+                level = strainData.level or 1,
+                perks = strainData.perks and json.decode(strainData.perks) or {},
+                unlocked = strainData.unlocked and json.decode(strainData.unlocked) or {},
+                indoor_unlocked = strainData.indoor_unlocked == 1,
+                indoor_upgrades = strainData.indoor_upgrades and json.decode(strainData.indoor_upgrades) or {},
                 n = strain.n,
                 p = strain.p,
                 k = strain.k,

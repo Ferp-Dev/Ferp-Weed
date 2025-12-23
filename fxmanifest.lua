@@ -13,6 +13,7 @@ shared_scripts {
     'shared/sh_config.lua',
     'shared/sh_weed.lua',
     'shared/sh_strains.lua',
+    'shared/sh_perks.lua',
     'shared/sh_plants.lua',
     'shared/sh_items.lua',
     'shared/sh_cornering.lua'
@@ -24,7 +25,9 @@ client_scripts {
     'client/cl_strains.lua',
     'client/cl_items.lua',
     'client/cl_cornering.lua',
-    'client/cl_targets.lua'
+    'client/cl_targets.lua',
+    'client/cl_laptop.lua',
+    'client/cl_nui.lua'
 }
 
 server_scripts {
@@ -34,7 +37,8 @@ server_scripts {
     'server/sv_strains.lua',
     'server/sv_items.lua',
     'server/sv_cornering.lua',
-    'server/sv_dealers.lua'
+    'server/sv_dealers.lua',
+    'server/sv_laptop.lua'
 }
 
 dependencies {
@@ -46,5 +50,8 @@ dependencies {
 }
 
 files {
-    'locales/*.json'
+    'locales/*.json',
+    'web/index.html',
+    'web/style.css',
+    'web/script.js'
 }

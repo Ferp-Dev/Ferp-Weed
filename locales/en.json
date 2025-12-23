@@ -84,7 +84,7 @@
         "enter_new_name": "Enter the new name for the strain:",
         "planting_instructions": "[E] Confirm | [Scroll] Rotate | [Backspace] Cancel"
     },
-"plant": {
+    "plant": {
         "gender_male": "Male",
         "gender_female": "Female",
         "gender_info": "Gender: %s",
@@ -141,6 +141,7 @@
         "not_your_strain": "This is not your strain",
         "already_renamed": "Strain has already been renamed",
         "insufficient_reputation": "Insufficient reputation",
+        "insufficient_level_rename": "Insufficient level to rename (Minimum Level 5)",
         "invalid_name": "Invalid name (5-50 characters)",
         "rename_error": "Error renaming",
         "strain_renamed": "Strain renamed successfully",
@@ -208,7 +209,20 @@
         "sold_baggies_tip": "Sold %d baggie(s) for $%d (+tip!)",
         "sold_baggies_normal": "Sold %d baggie(s) for $%d",
         "sold_baggies_reduced": "Sold %d baggie(s) for $%d (reduced price)",
-        "plant_too_big_strain": "Plant is too big to create custom strain"
+        "plant_too_big_strain": "Plant is too big to create custom strain",
+        "strain_level_up": "Strain %s reached Level %d!",
+        "not_strain_owner": "You do not own this strain",
+        "strain_level_too_low": "Strain level too low for this perk",
+        "not_enough_points": "Not enough perk points",
+        "perk_maxed": "Perk maxed out",
+        "perk_unlocked": "Perk Unlocked!",
+        "processed_bricks": "Created %d brick(s): %s",
+        "admin_gave_seed": "Gave %d seed(s) to player %d",
+        "received_seed": "Received %d seed(s) from %s",
+        "admin_gave_bud": "Gave %d bud(s) to player %d",
+        "received_bud": "Received %d bud(s) from %s",
+        "strain_info_chat": "Strain #%d: %s",
+        "reloaded_strains": "Reloaded %d strains"
     },
     "items": {
         "female_seed": "Female Seed",

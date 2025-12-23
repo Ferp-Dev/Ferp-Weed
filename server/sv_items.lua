@@ -111,7 +111,7 @@ RegisterNetEvent('Ferp-Weed:server:processPackaging', function(processType)
         
         if totalBricks > 0 then
             local summary = table.concat(strainsSummary, ', ')
-            Weed.Notify(src, string.format('Criou %d brick(s): %s', totalBricks, summary), 'success')
+            Weed.Notify(src, Lang('notify', 'processed_bricks', totalBricks, summary), 'success')
         else
             Weed.Notify(src, Lang('notify', 'need_buds_strain', budsNeeded), 'error')
         end

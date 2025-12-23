@@ -20,7 +20,7 @@ CreateThread(function()
     end
     
     Weed.Plants.ConfigReady = true
-    Weed.Debug("Client initialized successfully")
+
 end)
 
 -- Update current ped cache
@@ -34,7 +34,7 @@ end)
 -- Receive strain updates from server
 RegisterNetEvent('Ferp-Weed:client:loadStrains', function(strains)
     Weed.Strains.Created = strains
-    Weed.Debug("Loaded %d strains", #strains)
+
 end)
 
 -- Helper function to get closest player
@@ -141,4 +141,3 @@ exports('PlayAnimation', PlayAnimation)
 exports('PlayScenario', PlayScenario)
 exports('ShowProgress', ShowProgress)
 
-Weed.Debug("Client main loaded")

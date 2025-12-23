@@ -3,49 +3,6 @@ local QBX = exports.qbx_core
 -- Load locales on resource start
 Weed.LoadLocale()
 
--- Database Setup
-CreateThread(function()
-    -- Create tables if they don't exist
-    MySQL.query([[
-        CREATE TABLE IF NOT EXISTS `weed_plants` (
-            `id` INT(11) NOT NULL AUTO_INCREMENT,
-            `citizenid` VARCHAR(50) NOT NULL,
-            `coords` TEXT NOT NULL,
-            `metadata` LONGTEXT NOT NULL,
-            `created_at` INT(11) NOT NULL,
-            `expires_at` INT(11) NOT NULL,
-            PRIMARY KEY (`id`),
-            INDEX `citizenid` (`citizenid`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-    ]])
-    
-    MySQL.query([[
-        CREATE TABLE IF NOT EXISTS `weed_strains` (
-            `id` INT(11) NOT NULL AUTO_INCREMENT,
-            `citizenid` VARCHAR(50) NOT NULL,
-            `name` VARCHAR(255) DEFAULT NULL,
-            `strain` TEXT NOT NULL,
-            `reputation` INT(11) DEFAULT 0,
-            `renamed` TINYINT(1) DEFAULT 0,
-            PRIMARY KEY (`id`),
-            INDEX `citizenid` (`citizenid`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-    ]])
-    
-    MySQL.query([[
-        CREATE TABLE IF NOT EXISTS `weed_dealers` (
-            `id` INT(11) NOT NULL AUTO_INCREMENT,
-            `citizenid` VARCHAR(50) NOT NULL UNIQUE,
-            `reputation` INT(11) DEFAULT 0,
-            `last_sell` INT(11) DEFAULT 0,
-            PRIMARY KEY (`id`),
-            INDEX `citizenid` (`citizenid`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-    ]])
-    
-    Weed.Debug("Database tables initialized")
-end)
-
 -- Player Loading
 AddEventHandler('QBCore:Server:PlayerLoaded', function(Player)
     if not Player then return end
@@ -83,12 +40,66 @@ lib.callback.register('Ferp-Weed:server:getPlants', function(source)
     return Weed.Plants.Active
 end)
 
+lib.callback.register('Ferp-Weed:server:hasVpnItem', function(source)
+    local hasItem = exports.ox_inventory:GetItemCount(source, 'vpn')
+    return (hasItem and hasItem > 0)
+end)
+
 lib.callback.register('Ferp-Weed:server:getDealerReputation', function(source, citizenid)
     local Player = QBX:GetPlayer(source)
     if not Player then return nil end
     
     citizenid = citizenid or Player.PlayerData.citizenid
-    return Weed.Dealers.GetReputation(citizenid)
+    
+    -- Get base reputation
+    local repData = Weed.Dealers.GetReputation(citizenid)
+    
+    -- Calculate derived stats from Perks (Fast Seller & Bulk Seller)
+    -- We scan the player's INVENTORY to see what strains they are carrying.
+    -- If they are carrying a high-level strain, they get the buff, regardless of who created it.
+    local maxFastSeller = 0
+    local maxBulkSeller = 0
+    
+    local inventory = exports.ox_inventory:GetInventoryItems(source)
+    
+    if inventory then
+        for _, item in pairs(inventory) do
+            if item.name == 'weed_baggie' and item.metadata and item.metadata.strain then
+                local strainId = item.metadata.strain
+                -- Try to get strain data
+                local strain = Weed.Strains.Get(strainId)
+                
+                -- Support default strains if they eventually have perks
+                if not strain and strainId < 0 then
+                    strain = Weed.Strains.GetDefaultById(strainId)
+                end
+                
+                if strain and strain.perks then
+                    -- Fast Seller
+                    local fastLvl = strain.perks['fast_seller'] or 0
+                    if fastLvl > maxFastSeller then maxFastSeller = fastLvl end
+                    
+                    -- Bulk Seller
+                    local bulkLvl = strain.perks['bulk_seller'] or 0
+                    if bulkLvl > maxBulkSeller then maxBulkSeller = bulkLvl end
+                end
+            end
+        end
+    end
+    
+    -- Apply Fast Seller Modifier
+    if maxFastSeller > 0 then
+        local mod = Weed.Perks.GetModifier({['fast_seller'] = maxFastSeller}, 'fast_seller')
+        repData.fastSellerMult = mod -- e.g. 0.9 for 10% reduction
+    end
+    
+    -- Apply Bulk Seller Chance
+    if maxBulkSeller > 0 then
+        local chance = Weed.Perks.GetModifier({['bulk_seller'] = maxBulkSeller}, 'bulk_seller')
+        repData.bulkSellerChance = chance -- e.g. 10 for 10%
+    end
+    
+    return repData
 end)
 
 -- Inventory Item Use Events
@@ -214,8 +225,8 @@ lib.addCommand('giveseed', {
         Weed.AddItem(targetId, 'weed_seed_female', 1, metadata)
     end
     
-    Weed.Notify(source, string.format('Deu %d semente(s) para jogador %d', amount, targetId), 'success')
-    Weed.Notify(targetId, string.format('Recebeu %d semente(s) de %s', amount, strain.name), 'success')
+    Weed.Notify(source, Lang('notify', 'admin_gave_seed', amount, targetId), 'success')
+    Weed.Notify(targetId, Lang('notify', 'received_seed', amount, strain.name), 'success')
 end)
 
 lib.addCommand('givebud', {
@@ -246,8 +257,8 @@ lib.addCommand('givebud', {
     
     Weed.AddItem(targetId, 'weed_bud', amount, metadata)
     
-    Weed.Notify(source, string.format('Deu %d bud(s) para jogador %d', amount, targetId), 'success')
-    Weed.Notify(targetId, string.format('Recebeu %d bud(s) de %s', amount, strain.name), 'success')
+    Weed.Notify(source, Lang('notify', 'admin_gave_bud', amount, targetId), 'success')
+    Weed.Notify(targetId, Lang('notify', 'received_bud', amount, strain.name), 'success')
 end)
 
 lib.addCommand('liststrains', {
@@ -263,29 +274,7 @@ lib.addCommand('liststrains', {
     Weed.Notify(source, Lang('notify', 'strains_listed_console'), 'info')
 end)
 
-lib.addCommand('mystrains', {
-    help = 'Ver suas strains'
-}, function(source, args, raw)
-    local Player = QBX:GetPlayer(source)
-    if not Player then return end
-    
-    local citizenid = Player.PlayerData.citizenid
-    local found = false
-    
-    print('--- SUAS STRAINS ---')
-    for id, strain in pairs(Weed.Strains.Created) do
-        if strain.citizenid == citizenid then
-            found = true
-            print(string.format('ID: %d | Nome: %s | NPK: %.1f/%.1f/%.1f | Rep: %d', 
-                id, strain.name or 'SEM NOME', strain.n or 0, strain.p or 0, strain.k or 0, strain.reputation or 0))
-            Weed.Notify(source, string.format('Strain #%d: %s', id, strain.name or 'SEM NOME'), 'info')
-        end
-    end
-    
-    if not found then
-        Weed.Notify(source, Lang('notify', 'no_strains_registered'), 'error')
-    end
-end)
+
 
 lib.addCommand('reloadstrains', {
     help = 'Recarregar strains do banco',
@@ -327,7 +316,6 @@ lib.addCommand('reloadstrains', {
     -- Broadcast to all clients
     TriggerClientEvent('Ferp-Weed:client:loadStrains', -1, Weed.Strains.Created)
     
-    Weed.Notify(source, string.format('Recarregado %d strains', strains and #strains or 0), 'success')
+    Weed.Notify(source, Lang('notify', 'reloaded_strains', strains and #strains or 0), 'success')
 end)
 
-Weed.Debug("Server main loaded successfully")

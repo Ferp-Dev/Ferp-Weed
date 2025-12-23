@@ -146,19 +146,20 @@ RegisterNetEvent('Ferp-Weed:server:sellBaggie', function(pedNetId, zone, moneyMu
     if processingSales[src] then return end
     processingSales[src] = true
     
-    -- Valores padrão
+    -- Defaults and Capping
     moneyMult = moneyMult or 1.0
     quantity = quantity or 1
+    if quantity > 5 then quantity = 5 end -- Safety Cap
     
     local citizenid = Player.PlayerData.citizenid
     
-    -- Get inventory
+    -- Get all baggies in inventory
     local inventory = exports.ox_inventory:GetInventoryItems(src)
     local baggies = {}
     
     for slot, item in pairs(inventory) do
         if item.name == 'weed_baggie' then
-            table.insert(baggies, {slot = slot, data = item})
+            table.insert(baggies, item) -- Store entire item object
         end
     end
     
@@ -167,93 +168,143 @@ RegisterNetEvent('Ferp-Weed:server:sellBaggie', function(pedNetId, zone, moneyMu
         return Weed.Notify(src, Lang('notify', 'no_baggies'), 'error')
     end
     
-    -- Verificar se tem quantidade suficiente
-    if #baggies < quantity then
-        quantity = #baggies
-    end
-    
     local totalEarned = 0
+    local remainingToSell = quantity
+    local soldCount = 0
     
-    for i = 1, quantity do
-        local baggie = baggies[i]
+    Weed.Debug("[SELL] Request: %d items | Mult: %.2f", quantity, moneyMult)
+    
+    for _, baggie in ipairs(baggies) do
+        if remainingToSell <= 0 then break end
         
-        -- Remove baggie
-        if Weed.RemoveItem(src, 'weed_baggie', 1, nil, baggie.slot) then
-            -- Calculate price
-            local quality = baggie.data.metadata.quality or 50
-            local strain = Weed.Strains.Get(baggie.data.metadata.strain)
-            local strainRep = strain and strain.reputation or 0
+        local countInSlot = baggie.count
+        local take = math.min(countInSlot, remainingToSell)
+        
+        -- Calculate Price Per Unit for this specific baggie
+        local quality = baggie.metadata.quality or 50
+        local strainId = baggie.metadata.strain
+        local strain = Weed.Strains.Get(strainId)
+        local strainRep = strain and strain.reputation or 0
+        
+        local priceUnit = Weed.Cornering.CalculatePrice(quality, strainRep)
+        local originalPrice = priceUnit
+        
+        -- Apply Negotiator Perk
+        if strain and type(strain) == 'table' then
+            local negotiatorMult = Weed.Perks.GetModifier(strain.perks, 'negotiator')
+            if negotiatorMult > 1.0 then
+                priceUnit = math.floor(priceUnit * negotiatorMult)
+            end
             
-            local price = Weed.Cornering.CalculatePrice(quality, strainRep)
-            
-            -- Aplicar multiplicador do evento
-            price = math.floor(price * moneyMult)
-            totalEarned = totalEarned + price
-            
-            -- Update reputations
-            if quality > 50 then
-                Weed.Dealers.UpdateReputation(citizenid, 1)
-                if strain then
-                    Weed.Strains.UpdateReputation(strain.id, 1)
+            -- MASTERY BUFFS: Sales
+            if strain.unlocked then
+                local function HasMastery(id)
+                    for _, uid in ipairs(strain.unlocked) do
+                        if uid == id then return true end
+                    end
+                    return false
                 end
-            elseif quality < 50 then
-                Weed.Dealers.UpdateReputation(citizenid, -1)
-                if strain then
-                    Weed.Strains.UpdateReputation(strain.id, -1)
+                
+                -- m10q: Terpenes (1.5x Sell Price)
+                if HasMastery('m10q') then
+                    priceUnit = math.floor(priceUnit * 1.5)
                 end
             end
         end
         
-        Wait(50)
+        -- Apply Event Multiplier
+        local safeMult = math.min(moneyMult, 2.0) -- Hard cap multiplier at 2x
+        priceUnit = math.floor(priceUnit * safeMult)
+        
+        -- ULTIMATE SAFETY CAP
+        if priceUnit > 3000 then 
+            Weed.Debug("[SELL] WARNING: Price Unit exceeded limit (%d). Capped at 3000.", priceUnit)
+            priceUnit = 3000 
+        end
+        
+        -- Weed.Debug("[SELL] Slot: %d | Take: %d | Unit Price: %d (Orig: %d)", baggie.slot, take, priceUnit, originalPrice)
+
+        -- Try to remove items
+        if Weed.RemoveItem(src, 'weed_baggie', take, nil, baggie.slot) then
+            totalEarned = totalEarned + (priceUnit * take)
+            remainingToSell = remainingToSell - take
+            soldCount = soldCount + take
+            
+            -- Update Reputations logic (per bag logic)
+             if quality > 50 then
+                local repGain = 1
+                if strain and strain.unlocked then
+                    local function HasMastery(id)
+                        for _, uid in ipairs(strain.unlocked) do
+                            if uid == id then return true end
+                        end
+                         return false
+                    end
+                    if HasMastery('m15q') then repGain = 2 end
+                end
+                
+                Weed.Dealers.UpdateReputation(citizenid, repGain * take)
+                if strain then
+                    Weed.Strains.UpdateReputation(strain.id, repGain * take)
+                end
+            end
+            
+            -- Add XP Logic
+             if strain and strain.id and strain.id > 0 then
+                Weed.Strains.AddXP(strain.id, Weed.Perks.XP.Actions.Sell * take)
+            end
+        else
+            -- Weed.Debug("[SELL] Failed to remove item from slot %d", baggie.slot)
+        end
     end
     
-    if totalEarned > 0 then
+    if soldCount > 0 then
         -- Payout controlled by config: 'dirty' or 'clean'
         local payoutType = 'dirty'
         local dirtyItem = 'black_money'
         local cleanItem = 'money'
         if Weed and Weed.Cornering and Weed.Cornering.Config and Weed.Cornering.Config.Payout then
-            payoutType = Weed.Cornering.Config.Payout.Type or payoutType
-            dirtyItem = (Weed.Cornering.Config.Payout.Items and Weed.Cornering.Config.Payout.Items.dirty) or dirtyItem
-            cleanItem = (Weed.Cornering.Config.Payout.Items and Weed.Cornering.Config.Payout.Items.clean) or cleanItem
+             payoutType = Weed.Cornering.Config.Payout.Type or payoutType
+             dirtyItem = (Weed.Cornering.Config.Payout.Items and Weed.Cornering.Config.Payout.Items.dirty) or dirtyItem
+             cleanItem = (Weed.Cornering.Config.Payout.Items and Weed.Cornering.Config.Payout.Items.clean) or cleanItem
         end
+        
+        -- Weed.Debug("[SELL] Total Earned: %d | Type: %s", totalEarned, payoutType)
 
         if payoutType == 'dirty' then
             if exports.ox_inventory:CanCarryItem(src, dirtyItem, totalEarned) then
                 Weed.AddItem(src, dirtyItem, totalEarned)
             else
-                -- Fallback:
-                if cleanItem and exports.ox_inventory and exports.ox_inventory:CanCarryItem(src, cleanItem, totalEarned) then
+                if cleanItem and exports.ox_inventory:CanCarryItem(src, cleanItem, totalEarned) then
                     Weed.AddItem(src, cleanItem, totalEarned)
                 else
                     Player.Functions.AddMoney('cash', totalEarned)
                 end
             end
         else
-            -- payoutType == 'clean'
-            if cleanItem and exports.ox_inventory and exports.ox_inventory:CanCarryItem(src, cleanItem, totalEarned) then
+             if cleanItem and exports.ox_inventory:CanCarryItem(src, cleanItem, totalEarned) then
                 Weed.AddItem(src, cleanItem, totalEarned)
             else
                 Player.Functions.AddMoney('cash', totalEarned)
             end
         end
         
-        -- Mensagem diferente baseada no multiplicador
         local msg
         if moneyMult > 1.0 then
-            msg = Lang('notify', 'sold_baggies_tip', quantity, totalEarned)
+            msg = Lang('notify', 'sold_baggies_tip', soldCount, totalEarned)
         elseif moneyMult < 1.0 then
-            msg = Lang('notify', 'sold_baggies_reduced', quantity, totalEarned)
+             msg = Lang('notify', 'sold_baggies_reduced', soldCount, totalEarned)
         else
-            msg = Lang('notify', 'sold_baggies_normal', quantity, totalEarned)
+             msg = Lang('notify', 'sold_baggies_normal', soldCount, totalEarned)
         end
         
         Weed.Notify(src, msg, 'success')
+        -- Weed.Debug("Player %s sold %d baggies (req: %d) for $%d", citizenid, soldCount, quantity, totalEarned)
+    else
+        Weed.Notify(src, Lang('notify', 'no_baggies'), 'error')
     end
     
     processingSales[src] = nil
-    
-    Weed.Debug("Player %s sold %d baggies for $%d (mult: %.1f)", citizenid, quantity, totalEarned, moneyMult)
 end)
 
 -- Create evidence

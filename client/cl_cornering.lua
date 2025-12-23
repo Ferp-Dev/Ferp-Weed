@@ -68,8 +68,11 @@ local function ProcessRandomEvent(ped)
         }
     end
     
-    -- Cliente quer comprar mais
-    cumulativeChance = cumulativeChance + RandomEvents.Chances.clienteCompraExtra
+    local bulkBonus = (Weed.Cornering.CurrentBulkChance or 0) / 100 -- e.g. 30 / 100 = 0.3
+    cumulativeChance = cumulativeChance + RandomEvents.Chances.clienteCompraExtra + bulkBonus
+    
+    -- Weed.Debug("[CORNERING] Roll: %.2f | Extra Chance: %.2f (Bonus: %.2f)", roll, cumulativeChance, bulkBonus)
+
     if roll < cumulativeChance then
         return {
             type = "compra_extra",
@@ -332,6 +335,15 @@ function StartCustomerLoop()
         local notFoundCount = 0
         local dealerRep = lib.callback.await('Ferp-Weed:server:getDealerReputation', false)
         local timer = dealerRep and dealerRep.timer or Weed.Cornering.Config.TimeBetweenAcquisition
+        
+        -- Apply Fast Seller Perk
+        if dealerRep and dealerRep.fastSellerMult then
+            timer = timer * dealerRep.fastSellerMult
+        end
+        
+        -- Store Bulk Seller Chance for Random Events
+        local currentBulkChance = dealerRep and dealerRep.bulkSellerChance or 0
+        Weed.Cornering.CurrentBulkChance = currentBulkChance
         
         -- print('[CORNERING] Timer entre clientes: ' .. timer .. ' segundos')
         

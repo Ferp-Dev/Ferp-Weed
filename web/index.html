@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weed Lab</title>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <!-- VPN Lock Screen -->
+    <div id="vpn-screen" class="weed-lab-container center-content hidden">
+        <div>
+            <i class="fa-solid fa-lock vpn-lock-icon"></i>
+            <h1 class="vpn-title">Connection Secure Required</h1>
+            <p class="vpn-desc">A secure VPN connection is required to establish a link with the Weed Lab private
+                network.</p>
+        </div>
+    </div>
+
+    <!-- Main List View -->
+    <div id="list-view" class="weed-lab-container hidden">
+        <div class="welcome-hero">
+            <div class="welcome-hero-content">
+                <h1><i class="fa-solid fa-cannabis"></i> Weed Lab</h1>
+                <p>Advanced Genetic Modification Terminal</p>
+            </div>
+            <div class="hero-stats-group">
+                <div class="welcome-hero-stat">
+                    <span class="stat-val status-secure"><i class="fa-solid fa-user-shield"></i></span>
+                    <span class="stat-label">VPN Secure</span>
+                </div>
+                <div class="welcome-hero-stat">
+                    <span class="stat-val" id="best-strain-lvl">0</span>
+                    <span class="stat-label">Best Level</span>
+                </div>
+                <div class="welcome-hero-stat">
+                    <span class="stat-val" id="total-strains-count">0</span>
+                    <span class="stat-label">Active Strains</span>
+                </div>
+            </div>
+        </div>
+        <div class="strain-grid-wrapper">
+            <div id="strain-grid" class="strain-grid">
+                <!-- Strains injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Details View -->
+    <div id="details-view" class="weed-lab-container split-view hidden">
+        <!-- Sidebar -->
+        <div class="details-sidebar">
+            <div class="strain-summary">
+                <h2 id="strain-name-display">Unknown Strain</h2>
+                <span id="strain-id-display" class="id-badge">#0000</span>
+                <div id="rename-container" class="rename-group hidden">
+                    <input id="rename-input" class="rename-input" minlength="5" maxlength="50">
+                    <button id="btn-save-rename" class="btn-save-rename"><i class="fa-solid fa-check"></i></button>
+                    <button id="btn-cancel-rename" class="btn-cancel-rename"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <i id="btn-rename-trigger" class="fa-solid fa-pen rename-icon hidden" title="Rename Strain"></i>
+            </div>
+
+            <button class="nav-btn active" data-tab="evolution">
+                <i class="fa-solid fa-chart-pie"></i> Evolution
+            </button>
+            <button class="nav-btn" data-tab="genetics">
+                <i class="fa-solid fa-dna"></i> Genetics
+            </button>
+            <button class="nav-btn" data-tab="indoor">
+                <i class="fa-solid fa-house-chimney"></i> Facilities
+                <i id="indoor-lock-icon" class="fa-solid fa-lock lock-icon hidden"></i>
+            </button>
+
+            <button id="btn-back" class="nav-btn back-btn">Back</button>
+        </div>
+
+        <div class="details-content">
+            <!-- Global Points Header -->
+            <div class="pts-header">
+                <span>Evolution Points:</span>
+                <span id="pts-val-display" class="pts-val">0 PTS</span>
+            </div>
+
+            <!-- Tab: Evolution -->
+            <div id="tab-evolution" class="tab-pane fade-in">
+                <div class="dashboard-grid">
+                    <div class="dash-card">
+                        <h4>Strain Level <i class="fa-solid fa-layer-group"></i></h4>
+                        <div class="level-display">
+                            <div id="level-circle-display" class="level-circle">0</div>
+                            <div class="points-info">
+                                <div id="points-val-display" class="points-val">0</div>
+                                <div class="points-label">Points Available</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dash-card">
+                        <h4>Lab Analysis <i class="fa-solid fa-microscope"></i></h4>
+                        <div class="stat-bar">
+                            <div class="stat-label"><span>Potency (THC)</span> <span id="stat-p-val">0%</span></div>
+                            <div class="bar-bg">
+                                <div id="stat-p-bar" class="bar-fill purple" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-label"><span>Growth</span> <span id="stat-g-val">x1.0</span></div>
+                            <div class="bar-bg">
+                                <div id="stat-g-bar" class="bar-fill blue" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-label"><span>Resilience</span> <span id="stat-r-val">0%</span></div>
+                            <div class="bar-bg">
+                                <div id="stat-r-bar" class="bar-fill orange" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mastery-section-title">
+                    <i class="fa-solid fa-crown" style="color: gold; margin-right: 10px;"></i> Mastery Path
+                </div>
+
+                <div id="mastery-container">
+                    <!-- Mastery Rows -->
+                </div>
+            </div>
+
+            <!-- Tab: Genetics -->
+            <div id="tab-genetics" class="tab-pane hidden fade-in">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin: 0; color: #fff;">Skill Tree</h3>
+                </div>
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="production">Production</button>
+                    <button class="filter-btn" data-filter="reproduction">Reproduction</button>
+                    <button class="filter-btn" data-filter="sales">Sales</button>
+                    <button class="filter-btn" data-filter="effects">Effects</button>
+                </div>
+                <div id="genetics-grid" class="tree-grid">
+                    <!-- Genetics Nodes -->
+                </div>
+            </div>
+
+            <!-- Tab: Indoor -->
+            <div id="tab-indoor" class="tab-pane hidden fade-in">
+                <div class="indoor-header">
+                    <h3><i class="fa-solid fa-warehouse"></i> Indoor Operation</h3>
+                    <p>Manage equipment for safe indoor cultivation.</p>
+                </div>
+
+                <div id="indoor-content">
+                    <!-- Dynamic Indoor Content -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+
+</html>

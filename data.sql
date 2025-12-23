@@ -25,6 +25,12 @@ CREATE TABLE IF NOT EXISTS `weed_strains` (
     `name` VARCHAR(255) DEFAULT NULL,
     `strain` TEXT NOT NULL,
     `reputation` INT(11) DEFAULT 0,
+    `xp` INT(11) DEFAULT 0,
+    `level` INT(11) DEFAULT 1,
+    `perks` JSON DEFAULT NULL,
+    `unlocked` JSON DEFAULT NULL COMMENT 'Mastery unlocks',
+    `indoor_unlocked` TINYINT(1) DEFAULT 0,
+    `indoor_upgrades` JSON DEFAULT NULL,
     `renamed` TINYINT(1) DEFAULT 0,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
@@ -40,6 +46,7 @@ CREATE TABLE IF NOT EXISTS `weed_dealers` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_citizenid` (`citizenid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- ============================================
 -- OX_INVENTORY ITEMS CONFIGURATION
@@ -181,6 +188,15 @@ CREATE TABLE IF NOT EXISTS `weed_dealers` (
     close = true,
     description = 'Modifier for strain attributes'
 },
+
+    ['vpn'] = {
+        label = 'Vpn',
+        weight = 500,
+        stack = false,
+        close = true,
+        durability = 100,
+        description = '?',
+    },
 
 ]]
 
